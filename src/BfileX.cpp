@@ -155,8 +155,32 @@ int main() {
         }
     );
 
+    int prevIndex;
+    auto indexUpdated = [&]() -> bool {
+        if (fileIndex != prevIndex) {
+            prevIndex = fileIndex;
+            return true;
+        }
+        return false;
+    };
+
+    auto prevPath = fs::current_path();
+    auto pathUpdated = [&]() -> bool {
+        if (const auto currenPath = fs::current_path(); currenPath != prevPath) {
+            prevPath = currenPath;
+            return true;
+        }
+        return false;
+    };
+
     // render loop
     while (isRunning) {
+        Terminal::sleep(60);
+
+        // dynamic rendering
+        if (!(ui.isResized() or indexUpdated() or pathUpdated()))
+            continue;
+
         Terminal::clearScreen();
         getEntries(fs::current_path(), entries, false, true);
 
@@ -196,7 +220,6 @@ int main() {
         );
 
         Terminal::flush();
-        Terminal::sleep(60);
     }
 
     Terminal::showCursor();
