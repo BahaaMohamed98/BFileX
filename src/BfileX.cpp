@@ -2,7 +2,12 @@
 #include <atomic>
 #include <filesystem>
 #include "Terminal++.hpp"
+
 namespace fs = std::filesystem;
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 std::atomic<int> selectionWidth;
 
@@ -31,9 +36,14 @@ void getEntries(const fs::path& rootPath, std::vector<fs::directory_entry>& entr
     entries.clear();
 
     auto isHidden = [](const fs::directory_entry& entry) {
+#ifdef _WIN32 // For Windows
+        return (GetFileAttributes(entry.path().string().c_str()) & FILE_ATTRIBUTE_HIDDEN) != 0;
+#else // For Unix-based systems
         return entry.path().filename().string().front() == '.';
+#endif
     };
 
+    // add entires and filter based on the all paramter
     for (const auto& item : fs::directory_iterator(rootPath)) {
         if (all or !isHidden(item))
             entries.emplace_back(item);
@@ -44,6 +54,7 @@ void getEntries(const fs::path& rootPath, std::vector<fs::directory_entry>& entr
     if (sort) {
         // rank hidden file higher then directories and sort lexicographically
         std::sort(entries.begin(), entries.end(), [&](const auto& first, const auto& second) {
+            // rank hidden files (dot-files) the highest
             if (all) {
                 if (isHidden(first) and !isHidden(second))
                     return true;
@@ -51,6 +62,7 @@ void getEntries(const fs::path& rootPath, std::vector<fs::directory_entry>& entr
                     return false;
             }
 
+            // rank directories higher
             if (first.is_directory() and !second.is_directory())
                 return true;
             if (!first.is_directory() and second.is_directory())
