@@ -195,7 +195,7 @@ int main() {
             continue;
 
         Terminal::clearScreen();
-        getEntries(fs::current_path(), entries, false, true);
+        getEntries(fs::current_path(), entries, true, true);
 
         auto [tWidth,tHeight] = Terminal::size();
         selectionWidth = tWidth / 2;
