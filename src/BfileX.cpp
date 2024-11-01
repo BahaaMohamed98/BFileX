@@ -42,7 +42,7 @@ void getEntries(const fs::path& rootPath, std::vector<fs::directory_entry>& entr
     entries.emplace_back(".."); // add previous directory
 
     if (sort) {
-        // rank directories higher and sort lexicographically
+        // rank hidden file higher then directories and sort lexicographically
         std::sort(entries.begin(), entries.end(), [&](const auto& first, const auto& second) {
             if (all) {
                 if (isHidden(first) and !isHidden(second))
@@ -56,7 +56,15 @@ void getEntries(const fs::path& rootPath, std::vector<fs::directory_entry>& entr
             if (!first.is_directory() and second.is_directory())
                 return false;
 
-            return first.path().string() < second.path().string();
+            // lexicographical sort
+            const std::string a = first.path().string(), b = second.path().string();
+            return std::lexicographical_compare(
+                a.begin(), a.end(),
+                b.begin(), b.end(),
+                [](const char& A, const char& B) {
+                    return tolower(A) < tolower(B);
+                }
+            );
         });
     }
 }
