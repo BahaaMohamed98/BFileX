@@ -4,7 +4,7 @@
 #include "Terminal++.hpp"
 namespace fs = std::filesystem;
 
-std::atomic<int> width;
+std::atomic<int> selectionWidth;
 
 // opening the file for user on specific OS
 void openFile(const std::string& filePath) {
@@ -30,8 +30,12 @@ void getEntries(const fs::path& rootPath, std::vector<fs::directory_entry>& entr
                 const bool& sort = true) {
     entries.clear();
 
+    auto isHidden = [](const fs::directory_entry& entry) {
+        return entry.path().filename().string().front() == '.';
+    };
+
     for (const auto& item : fs::directory_iterator(rootPath)) {
-        if (all or item.path().filename().string().front() != '.')
+        if (all or isHidden(item))
             entries.emplace_back(item);
     }
 
@@ -39,11 +43,19 @@ void getEntries(const fs::path& rootPath, std::vector<fs::directory_entry>& entr
 
     if (sort) {
         // rank directories higher and sort lexicographically
-        std::sort(entries.begin(), entries.end(), [](const auto& first, const auto& second) {
+        std::sort(entries.begin(), entries.end(), [&](const auto& first, const auto& second) {
+            if (all) {
+                if (isHidden(first) and !isHidden(second))
+                    return true;
+                if (!isHidden(first) and isHidden(second))
+                    return false;
+            }
+
             if (first.is_directory() and !second.is_directory())
                 return true;
             if (!first.is_directory() and second.is_directory())
                 return false;
+
             return first.path().string() < second.path().string();
         });
     }
@@ -61,17 +73,17 @@ Color getColor(const fs::directory_entry& entry) {
 void printEntry(const fs::directory_entry& entry, const bool& highlight = false) {
     const Color color = getColor(entry);
     Terminal t;
-    t.setTextColor(color, true);
+    t.setTextColor(color).setStyle(Style::Bold);
 
     if (highlight)
-        t.setBackgroundColor(color).setTextColor(Color::Black, true);
+        t.setBackgroundColor(color).setTextColor(Color::Black).setStyle(Style::Bold);
 
     std::string entryStr = getName(entry).string();
 
-    if (static_cast<int>(entryStr.size()) >= width)     // limiting the number of characters
-        entryStr = entryStr.substr(0, width - 5) + "~"; // TODO: remove magic number
+    if (static_cast<int>(entryStr.size()) >= selectionWidth)     // limiting the number of characters
+        entryStr = entryStr.substr(0, selectionWidth - 5) + "~"; // TODO: remove magic number
 
-    t.print(" ", entryStr, std::setw(width - static_cast<int>(entryStr.size())), " ");
+    t.print(" ", entryStr, std::setw(selectionWidth - static_cast<int>(entryStr.size())), " ");
     Terminal(Color::Reset).println();
 }
 
@@ -104,6 +116,7 @@ int main() {
     std::atomic<int> fileIndex = 0;
 
     std::atomic<bool> isRunning{true};
+    Terminal::setTitle("BFilex");
     Terminal::clearScreen();
     Terminal::hideCursor();
 
@@ -155,7 +168,7 @@ int main() {
         }
     );
 
-    int prevIndex;
+    int prevIndex = -1; // Invalid index for inital update
     auto indexUpdated = [&]() -> bool {
         if (fileIndex != prevIndex) {
             prevIndex = fileIndex;
@@ -185,7 +198,7 @@ int main() {
         getEntries(fs::current_path(), entries, false, true);
 
         auto [tWidth,tHeight] = Terminal::size();
-        width = tWidth / 2;
+        selectionWidth = tWidth / 2;
 
         // top part
         std::string topBar = "$ " + (fs::current_path() / entries[fileIndex].path().filename()).string();
@@ -194,7 +207,10 @@ int main() {
         if (topBar.size() > tWidth)
             topBar = topBar.substr(0, tWidth - 1) + "~";
 
-        Terminal().setTextColor(Color::Blue, true).print(topBar.substr(0, std::min(lastSlashIndex + 1, topBar.size())));
+        Terminal().setTextColor(Color::Blue)
+                  .setStyle(Style::Bold).print(
+                      topBar.substr(0, std::min(lastSlashIndex + 1, topBar.size()))
+                  );
 
         if (lastSlashIndex < static_cast<int>(topBar.size()))
             ui.println(topBar.substr(lastSlashIndex + 1));
@@ -218,6 +234,11 @@ int main() {
             "  ",
             std::put_time(std::localtime(&cftime), "%a %b %e %r %Y") // Print formatted time
         );
+
+        std::string directoryNumber = " " + std::to_string(fileIndex + 1) +
+                                      "/" + std::to_string(static_cast<int>(entries.size()));
+        Terminal::moveTo(tWidth - static_cast<int>(directoryNumber.length()) + 1, tHeight);
+        ui.print(directoryNumber);
 
         Terminal::flush();
     }
