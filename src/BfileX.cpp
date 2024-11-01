@@ -35,7 +35,7 @@ void getEntries(const fs::path& rootPath, std::vector<fs::directory_entry>& entr
     };
 
     for (const auto& item : fs::directory_iterator(rootPath)) {
-        if (all or isHidden(item))
+        if (all or !isHidden(item))
             entries.emplace_back(item);
     }
 
@@ -195,7 +195,7 @@ int main() {
             continue;
 
         Terminal::clearScreen();
-        getEntries(fs::current_path(), entries, true, true);
+        getEntries(fs::current_path(), entries, false, true);
 
         auto [tWidth,tHeight] = Terminal::size();
         selectionWidth = tWidth / 2;
