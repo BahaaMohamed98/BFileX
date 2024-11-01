@@ -13,8 +13,8 @@ A simple, color-coded terminal file explorer with intuitive navigation and file 
 ## Screenshots
 
 <p align="center">
-    <img src="assets/screenshot1.png" alt="Screenshot 1" width="500"/>
-    <img src="assets/screenshot2.png" alt="Screenshot 2" width="500"/>
+    <img src="assets/screenshot1.png" alt="Screenshot 2" width="500"/>
+    <img src="assets/screenshot2.png" alt="Screenshot 1" width="500"/>
 </p>
 
 ## Installation
