@@ -1,4 +1,5 @@
-# Terminal-Based File Explorer
+
+# BFileX - Terminal-Based File Explorer
 
 A simple, color-coded terminal file explorer with intuitive navigation and file management, built using `Terminal++` and `std::filesystem`.
 
@@ -8,6 +9,11 @@ A simple, color-coded terminal file explorer with intuitive navigation and file 
 - **File Sorting**: Directories are ranked above files, and all items are sorted alphabetically.
 - **Permissions & Metadata**: View UNIX-style permissions and last modified timestamps.
 - **Color-Coded UI**: Directories, regular files, and other file types are displayed in distinct colors for readability.
+
+## Screenshots
+
+![Screenshot 1](assets/screenshot1.png)
+![Screenshot 2](assets/screenshot2.png)
 
 ## Installation
 
@@ -33,7 +39,7 @@ A simple, color-coded terminal file explorer with intuitive navigation and file 
 
 3. Run the explorer:
     ```bash
-    ./BfileX
+    ./BFileX
     ```
 
 ## Usage
