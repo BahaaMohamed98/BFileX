@@ -1,52 +1,67 @@
+# BFileX
 
-# BFileX - Terminal-Based File Explorer
+A modern, lightweight terminal file explorer written in C++. BFileX provides an intuitive interface for navigating and managing your files with vim-style keybindings and a color-coded display.
 
-A simple, color-coded terminal file explorer with intuitive navigation and file management, built using `Terminal++` and `std::filesystem`.
+## ✨ Features
 
-## Features
-- **Navigation**: Move up and down the file list with `j` (down) and `k` (up). Enter directories with `l` and return to the parent directory with `h`.
-- **File Opening**: Open files using the default application for your operating system.
-- **File Sorting**: Directories are ranked above files, and all items are sorted alphabetically.
-- **Permissions & Metadata**: View UNIX-style permissions and last modified timestamps.
-- **Color-Coded UI**: Directories, regular files, and other file types are displayed in distinct colors for readability.
+- 🎨 Color-coded interface for different file types
+- 📁 Vim-style navigation
+- 🚀 Fast and lightweight
+- 🔍 File type detection with custom icons
+- 📊 Detailed file information (permissions, size, modified date)
+- 🖥️ Cross-platform support (Linux, macOS, Windows)
+- 🔄 Real-time updates for file system changes
 
-## Screenshots
+## 🖼️ Screenshots
 
-<p align="center">
-    <img src="assets/screenshot1.png" alt="Screenshot 2" width="500"/>
-    <img src="assets/screenshot2.png" alt="Screenshot 1" width="500"/>
-</p>
+<div align="center">
+  <img src="assets/screenshot1.png" alt="BFileX Main Interface" width="600"/>
+  <img src="assets/screenshot2.png" alt="BFileX Main Interface" width="600"/>
+  <img src="assets/screenshot3.png" alt="BFileX Main Interface" width="600"/>
+  <br/>
+  <em>BFileX running in terminal with color-coded files and icons</em>
+</div>
 
-## Installation
+## 🚀 Installation
 
 ### Prerequisites
-- **C++17** or newer.
-- **Terminal++**: Ensure `Terminal++` is added as a submodule by running:
-    ```bash
-    git submodule update --init --recursive
-    ```
+- C++17 or higher
+- CMake 3.15 or higher
+- Git
 
-### Clone and Build
-1. Clone the repository:
-    ```bash
-    git clone https://github.com/BahaaMohamed98/BfileX.git
-    cd BfileX
-    ```
-2. Build with your preferred method (using CMake here as an example):
-    ```bash
-    cd build
-    cmake ..
-    make
-    ```
+### Build from Source
 
-3. Run the explorer:
-    ```bash
-    ./BFileX
-    ```
+#### Clone the repository
+```bash
 
-## Usage
-- **Move Down**: Press `j` or `Tab`.
-- **Move Up**: Press `k`.
-- **Enter Directory/Open File**: Press `l` or `Enter`.
-- **Go Back**: Press `h`.
-- **Quit**: Press `q` or `Esc`.
+git clone https://github.com/BahaaMohamed98/BfileX.git
+cd BfileX
+```
+
+#### Initialize submodules
+```bash
+git submodule update --init --recursive
+```
+
+#### Build using Cmake
+```bash
+cd build
+cmake ..
+make
+```
+#### Run the app
+```bash
+./BFileX
+```
+
+## 🎮 Default Keybindings
+
+| Key            | Action                    |
+|----------------|---------------------------|
+| `j` or `Tab`   | Move down                 |
+| `k`            | Move up                   |
+| `l` or `Enter` | Open file/Enter directory |
+| `h`            | Go to parent directory    |
+| `q` or `Esc`   | Quit                      |
+| `r`            | Rename file/directory     |
+| `d`            | Delete file/directory     |
