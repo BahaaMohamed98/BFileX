@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <vector>
 #include <sys/stat.h>
+
 namespace fs = std::filesystem;
 
 enum class SortType {
@@ -95,14 +96,14 @@ public:
         std::system((command + " \'" + filePath + "\'").c_str());
     }
 
-    static void getEntires(
+    static void setEntries(
         const fs::path& rootPath,
         std::vector<fs::directory_entry>& entries,
-        const bool& reverse,
-        const SortType& sortType = SortType::Normal,
-        const bool& showHidden = false
+        const bool& showHidden,
+        const SortType& sortType,
+        const bool& reverse
     ) {
-        entries.clear();
+        entries.clear(); // clear previous entries
 
         entries.emplace_back(".."); // add previous directory at the beginning
 
@@ -148,10 +149,8 @@ public:
     }
 
     static std::time_t getLastWriteTime(const fs::path& path) {
-        auto& app = App::getInstance();
-
         // last write time calculation
-        auto lastWrite = fs::last_write_time(app.getEntries()[app.fileIndex]);
+        auto lastWrite = fs::last_write_time(path);
         const auto time = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
             lastWrite - decltype(lastWrite)::clock::now() + std::chrono::system_clock::now()
         );

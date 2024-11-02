@@ -1,13 +1,15 @@
 #ifndef UI_HPP
 #define UI_HPP
-#include "App.hpp"
+#include "AppState.hpp"
 #include "FileManager.hpp"
 #include "Terminal++.hpp"
 
 class UI {
-    App& app;
-    // int tWidth{};
-    // int tHeight{};
+    AppState& app;
+    int tWidth{};
+    int tHeight{};
+    int selectionWidth{};
+    Terminal term;
 
     // todo: change
     static Color getColor(const fs::directory_entry& entry) {
@@ -15,6 +17,8 @@ class UI {
             return Color::Blue;
         if (FileManager::isExecutable(entry.path()))
             return Color::Red;
+        if (entry.is_symlink())
+            return Color::Cyan;
         if (entry.is_regular_file())
             return Color::Green;
         return Color::White;
@@ -27,12 +31,14 @@ class UI {
             return "  ";
         if (entry.path().filename().extension().string() == ".txt")
             return " ";
+        if (entry.is_symlink())
+            return "  ";
         if (entry.is_regular_file())
             return " ";
         return "? ";
     }
 
-    static void printEntry(const fs::directory_entry& entry, const bool& highlight = false) {
+    void printEntry(const fs::directory_entry& entry, const bool& highlight = false) const {
         const Color color = getColor(entry);
         Terminal t;
         t.setTextColor(color).setStyle(Style::Bold);
@@ -42,19 +48,23 @@ class UI {
 
         std::string entryStr = getIcon(entry) + FileManager::getName(entry).string();
 
-        if (static_cast<int>(entryStr.size()) >= App::getSelectionWidth())     // limiting the number of characters
-            entryStr = entryStr.substr(0, App::getSelectionWidth() - 5) + "~"; // TODO: remove magic number
+        if (static_cast<int>(entryStr.size()) >= selectionWidth)     // limiting the number of characters
+            entryStr = entryStr.substr(0, selectionWidth - 5) + "~"; // TODO: remove magic number
 
-        t.print(" ", entryStr, std::setw(App::getSelectionWidth() - static_cast<int>(entryStr.size())), " ");
+        t.print(" ", entryStr, std::setw(selectionWidth - static_cast<int>(entryStr.size())), " ");
         Terminal(Color::Reset).println();
     }
 
 public:
     UI()
-        : app(App::getInstance()) {
+        : app(AppState::getInstance()) {
         Terminal::setTitle("BFilex");
         Terminal::clearScreen();
         Terminal::hideCursor();
+
+        // setting the terminal dimensions
+        auto [nWidth,nHeight] = Terminal::size();
+        resize(nWidth, nHeight);
     }
 
     ~UI() {
@@ -64,10 +74,10 @@ public:
     void renderTopBar() const {
         Terminal::moveTo(1, 1); // todo: consider removing if not needed
 
-        std::string topBar = "$ " + (fs::current_path() / app.getEntries()[app.fileIndex].path().filename()).string();
+        std::string topBar = "$ " + (fs::current_path() / app.getCurrentEntry().path().filename()).string();
         const auto lastSlashIndex = topBar.find_last_of('/');
 
-        if (auto [tWidth,tHeight] = Terminal::size(); topBar.size() > tWidth)
+        if (topBar.size() > tWidth)
             topBar = topBar.substr(0, tWidth - 1) + "~";
 
         Terminal(Color::Blue)
@@ -82,28 +92,31 @@ public:
     void renderEntries() const {
         Terminal::moveTo(1, 2); // todo: consider removing if not needed
         for (int i = 0; i < app.getEntries().size(); ++i)
-            printEntry(app.getEntries()[i], i == app.fileIndex);
+            printEntry(app.getEntries()[i], i == app.getFileIndex());
     }
 
     void renderFooter() const {
-        const auto lastWriteTime = FileManager::getLastWriteTime(app.getEntries()[app.fileIndex]);
+        const auto lastWriteTime = FileManager::getLastWriteTime(app.getCurrentEntry().path());
 
         Terminal::moveTo(1, Terminal::size().height);
         Terminal().print(
-            app.getEntries()[app.fileIndex].is_directory() ? "d" : ".",      // print file type
-            FileManager::getPermissionsStr(app.getEntries()[app.fileIndex]), // print permissions
+            app.getCurrentEntry().is_directory() ? "d" : ".",      // print file type
+            FileManager::getPermissionsStr(app.getCurrentEntry()), // print permissions
             "  ",
             std::put_time(std::localtime(&lastWriteTime), "%a %b %e %r %Y") // Print formatted time
         );
 
         const std::string directoryNumber =
-                " " + std::to_string(app.fileIndex + 1) +
+                " " + std::to_string(app.getFileIndex() + 1) +
                 "/" + std::to_string(static_cast<int>(app.getEntries().size()));
-
-        auto [tWidth,tHeight] = Terminal::size();
 
         Terminal::moveTo(tWidth - static_cast<int>(directoryNumber.length()) + 1, tHeight);
         Terminal().print(directoryNumber);
+    }
+
+    void resize(const int& nWidth, const int& nHeight) {
+        tWidth = nWidth, tHeight = nHeight;
+        selectionWidth = tWidth / 2;
     }
 
     void renderApp() const {
@@ -113,10 +126,6 @@ public:
         renderFooter();
         Terminal::flush();
     }
-
-    // void setDimensions(const int& width, const int& height) {
-    //     app.setSelectionWidth(width / 2);
-    // }
 };
 
 #endif //UI_HPP

@@ -1,7 +1,7 @@
 #ifndef INPUTHANDLER_HPP
 #define INPUTHANDLER_HPP
 
-#include "App.hpp"
+#include "AppState.hpp"
 #include "FileManager.hpp"
 #include "Terminal++.hpp"
 
@@ -17,8 +17,9 @@ enum class Action {
 };
 
 class InputHandler {
-    App& app;
-    Terminal t;
+    static InputHandler* instance;
+    AppState& appState;
+    Terminal terminal;
 
     [[nodiscard]] constexpr static char keyMap(const Action& action) {
         switch (action) {
@@ -41,48 +42,51 @@ class InputHandler {
         }
     }
 
-public:
     InputHandler()
-        : app(App::getInstance()) {}
+        : appState(AppState::getInstance()) {}
+
+public:
+    InputHandler& operator=(const InputHandler&) = delete;
+
+    static InputHandler& getInstance() {
+        if (instance == nullptr)
+            instance = new InputHandler();
+        return *instance;
+    }
 
     void handleInput() {
-        t.nonBlock(
+        terminal.nonBlock(
             [&]() {
-                while (app.isRunning) {
+                while (appState.getState()) {
                     switch (Terminal::getChar()) {
                         case keyMap(Action::Up):
-                            if (app.fileIndex == 0)
-                                app.fileIndex = static_cast<int>(app.getEntries().size()) - 1;
-                            else
-                                --app.fileIndex;
+                            appState.decrementFileIndex();
                             break;
 
                         case keyMap(Action::Down):
                         case keyCode::Tab:
-                            if (!app.getEntries().empty())
-                                app.fileIndex = (app.fileIndex + 1) % static_cast<int>(app.getEntries().size());
-
+                            appState.incrementFileIndex();
                             break;
 
                         case keyMap(Action::Enter):
                         case keyCode::Enter:
-                            if (app.getEntries()[app.fileIndex].is_directory()) {
+                            if (appState.getCurrentEntry().is_directory()) {
                                 fs::current_path(
-                                    fs::current_path() / FileManager::getName(app.getEntries()[app.fileIndex])
+                                    fs::current_path() / FileManager::getName(appState.getCurrentEntry())
                                 );
-                                app.fileIndex = 0;
-                            } else if (FileManager::isExecutable(app.getEntries()[app.fileIndex])) {
+                                appState.resetFileIndex();
+                            } else if (FileManager::isExecutable(appState.getCurrentEntry())) {
                                 // TODO: implement
-                            } else if (app.getEntries()[app.fileIndex].is_regular_file()) {
+                            } else if (appState.getCurrentEntry().is_regular_file()) {
                                 FileManager::openFile(
-                                    fs::current_path() / app.getEntries()[app.fileIndex].path().string()
+                                    fs::current_path() / appState.getCurrentEntry().path().string()
                                 );
                             }
                             break;
 
                         case keyMap(Action::Back):
                             FileManager::changeDirectory(fs::current_path() / "..");
-                            app.fileIndex = 0; // TODO: make it stay at the same index
+                            appState.resetFileIndex(); // TODO: make it stay at the same index
                             break;
 
                         case keyMap(Action::Rename):
@@ -93,7 +97,7 @@ public:
 
                         case keyMap(Action::Quit):
                         case keyCode::Esc:
-                            app.isRunning = false;
+                            appState.setState(false);
                             break;
 
                         default:
@@ -104,5 +108,7 @@ public:
         );
     }
 };
+
+InputHandler* InputHandler::instance = nullptr;
 
 #endif //INPUTHANDLER_HPP
