@@ -74,8 +74,8 @@ public:
         return entries;
     }
 
-    void setHiddenFiles(const bool& show) {
-        showHiddenFiles = show;
+    void setHiddenFiles(const bool& showHiddenFiles) {
+        this->showHiddenFiles = showHiddenFiles;
     }
 
     [[nodiscard]] bool shouldShowHiddenEntries() const {

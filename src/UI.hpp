@@ -1,7 +1,7 @@
 #ifndef UI_HPP
 #define UI_HPP
 #include "AppState.hpp"
-#include "FileManager.hpp"
+#include "FileProperties.hpp"
 #include "Terminal++.hpp"
 
 class UI {
@@ -11,47 +11,24 @@ class UI {
     int selectionWidth{};
     Terminal term;
 
-    // todo: change
-    static Color getColor(const fs::directory_entry& entry) {
-        if (entry.is_directory())
-            return Color::Blue;
-        if (FileManager::isExecutable(entry.path()))
-            return Color::Red;
-        if (entry.is_symlink())
-            return Color::Cyan;
-        if (entry.is_regular_file())
-            return Color::Green;
-        return Color::White;
-    }
-
-    static std::string getIcon(const fs::directory_entry& entry) {
-        if (entry.is_directory())
-            return " ";
-        if (FileManager::isExecutable(entry.path()))
-            return "  ";
-        if (entry.path().filename().extension().string() == ".txt")
-            return " ";
-        if (entry.is_symlink())
-            return "  ";
-        if (entry.is_regular_file())
-            return " ";
-        return "? ";
-    }
-
     void printEntry(const fs::directory_entry& entry, const bool& highlight = false) const {
-        const Color color = getColor(entry);
-        Terminal t;
-        t.setTextColor(color).setStyle(Style::Bold);
+        Terminal terminal;
+        terminal.setStyle(Style::Bold);
+
+        const Color color = FileProperties::getColor(entry);
 
         if (highlight)
-            t.setBackgroundColor(color).setTextColor(Color::Black).setStyle(Style::Bold);
+            terminal.setTextColor(Color::Black).setBackgroundColor(color);
+        else
+            terminal.setTextColor(color);
 
-        std::string entryStr = getIcon(entry) + FileManager::getName(entry).string();
+        std::string entryStr = FileProperties::getIcon(entry).representation + FileProperties::getName(entry).string();
 
         if (static_cast<int>(entryStr.size()) >= selectionWidth)     // limiting the number of characters
             entryStr = entryStr.substr(0, selectionWidth - 5) + "~"; // TODO: remove magic number
 
-        t.print(" ", entryStr, std::setw(selectionWidth - static_cast<int>(entryStr.size())), " ");
+        terminal.print(" ", entryStr, std::setw(selectionWidth - static_cast<int>(entryStr.size())), " ");
+
         Terminal(Color::Reset).println();
     }
 
@@ -75,7 +52,7 @@ public:
         Terminal::moveTo(1, 1); // todo: consider removing if not needed
 
         std::string topBar = "$ " + (fs::current_path() / app.getCurrentEntry().path().filename()).string();
-        const auto lastSlashIndex = topBar.find_last_of('/');
+        const auto lastSlashIndex = topBar.find_last_of(fs::path::preferred_separator);
 
         if (topBar.size() > tWidth)
             topBar = topBar.substr(0, tWidth - 1) + "~";
@@ -96,12 +73,12 @@ public:
     }
 
     void renderFooter() const {
-        const auto lastWriteTime = FileManager::getLastWriteTime(app.getCurrentEntry().path());
+        const auto lastWriteTime = FileProperties::getLastWriteTime(app.getCurrentEntry().path());
 
         Terminal::moveTo(1, Terminal::size().height);
         Terminal().print(
-            app.getCurrentEntry().is_directory() ? "d" : ".",      // print file type
-            FileManager::getPermissionsStr(app.getCurrentEntry()), // print permissions
+            app.getCurrentEntry().is_directory() ? "d" : ".",           // print file type
+            FileProperties::permissionsToString(app.getCurrentEntry()), // print permissions
             "  ",
             std::put_time(std::localtime(&lastWriteTime), "%a %b %e %r %Y") // Print formatted time
         );

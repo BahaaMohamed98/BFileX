@@ -13,5 +13,6 @@ add_executable(BfileX src/main.cpp
         src/InputHandler.hpp
         src/AppState.hpp
         src/BFileX.hpp
+        src/FileProperties.hpp
 )
 add_executable(test src/test.cpp)

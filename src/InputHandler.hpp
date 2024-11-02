@@ -68,14 +68,14 @@ public:
                             appState.incrementFileIndex();
                             break;
 
-                        case keyMap(Action::Enter):
-                        case keyCode::Enter:
+                        case keyMap(Action::Enter)://todo: use switch
+                            case keyCode::Enter:
                             if (appState.getCurrentEntry().is_directory()) {
                                 fs::current_path(
-                                    fs::current_path() / FileManager::getName(appState.getCurrentEntry())
+                                    fs::current_path() / FileProperties::getName(appState.getCurrentEntry())
                                 );
                                 appState.resetFileIndex();
-                            } else if (FileManager::isExecutable(appState.getCurrentEntry())) {
+                            } else if (FileProperties::isExecutable(appState.getCurrentEntry())) {
                                 // TODO: implement
                             } else if (appState.getCurrentEntry().is_regular_file()) {
                                 FileManager::openFile(
