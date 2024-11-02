@@ -11,6 +11,8 @@ class UI {
     int selectionWidth{};
     Terminal term;
 
+    size_t startingIndex{};
+
     void printEntry(const fs::directory_entry& entry, const bool& highlight = false) const {
         Terminal terminal;
         terminal.setStyle(Style::Bold);
@@ -64,9 +66,30 @@ public:
             Terminal().println(topBar.substr(lastSlashIndex + 1));
     }
 
-    void renderEntries() const {
-        for (int i = 0; i < app.getEntries().size(); ++i)
-            printEntry(app.getEntries()[i], i == app.getFileIndex());
+    void renderEntries() {
+        const size_t currentIndex = app.getFileIndex();
+        const size_t totalEntries = app.getEntries().size();
+        const size_t maxVisibleEntries = tHeight - 2; // display height for the entries
+
+        if (maxVisibleEntries <= 0)
+            return;
+
+        // Update the starting index for scrolling
+        if (currentIndex >= startingIndex + maxVisibleEntries)
+            // if current index more than starting index: make current index the last displayed element
+            startingIndex = currentIndex - maxVisibleEntries + 1;
+        else if (currentIndex < startingIndex)
+            // if current index less than starting index: start from the current index
+            startingIndex = currentIndex;
+
+        // Calculate end index for display
+        const size_t endIndex = std::min(startingIndex + maxVisibleEntries, totalEntries);
+
+        // Render visible entries
+        const auto& entries = app.getEntries();
+        for (size_t i = startingIndex; i < endIndex; ++i) {
+            printEntry(entries[i], i == currentIndex);
+        }
     }
 
     void renderFooter() const {
@@ -93,7 +116,7 @@ public:
         selectionWidth = tWidth / 2;
     }
 
-    void renderApp() const {
+    void renderApp() {
         Terminal::clearScreen();
         renderTopBar();
         renderEntries();
