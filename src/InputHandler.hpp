@@ -11,9 +11,9 @@ enum class Action {
     Down,
     Enter,
     Back,
-    Quit,
     Rename,
-    Delete
+    Delete,
+    Quit,
 };
 
 class InputHandler {
@@ -21,29 +21,66 @@ class InputHandler {
     AppState& appState;
     Terminal terminal;
 
-    [[nodiscard]] constexpr static char keyMap(const Action& action) {
-        switch (action) {
-            case Action::Up:
-                return 'k';
-            case Action::Down:
-                return 'j';
-            case Action::Enter:
-                return 'l';
-            case Action::Back:
-                return 'h';
-            case Action::Rename:
-                return 'r';
-            case Action::Delete:
-                return 'd';
-            case Action::Quit:
-                return 'q';
-            default:
-                return '.';
-        }
-    }
+    static inline std::unordered_map<char, Action> keyMap{
+        {'k', Action::Up},
+        {'j', Action::Down}, {keyCode::Tab, Action::Down},
+        {'l', Action::Enter}, {keyCode::Enter, Action::Enter},
+        {'h', Action::Back},
+        {'r', Action::Rename},
+        {'d', Action::Delete},
+        {'q', Action::Quit}, {keyCode::Esc, Action::Quit},
+    };
 
     InputHandler()
         : appState(AppState::getInstance()) {}
+
+    void handleUp() const {
+        appState.decrementFileIndex();
+    }
+
+    void handleDown() const {
+        appState.incrementFileIndex();
+    }
+
+    void handleEnter() const {
+        switch (FileProperties::determineEntryType(appState.getCurrentEntry())) {
+            case EntryType::Directory:
+                FileManager::changeDirectory(
+                    fs::current_path() / FileProperties::getName(appState.getCurrentEntry())
+                );
+                appState.resetFileIndex();
+                break;
+            case EntryType::Executable:
+                // TODO: implement
+                break;
+            case EntryType::RegularFile:
+                FileManager::openFile(
+                    fs::current_path() / appState.getCurrentEntry().path().string()
+                );
+                break;
+            default:
+                break;
+        }
+    }
+
+    void handleBack() const {
+        FileManager::changeDirectory(fs::current_path() / "..");
+        appState.resetFileIndex(); // TODO: make it stay at the same index
+    }
+
+    // Todo: implement
+    void handleRename() const {}
+    void handleDelete() const {}
+
+    void handleQuit() const {
+        appState.setState(false);
+    }
+
+    [[nodiscard]] static Action getAction(const char& input) {
+        if (keyMap.find(input) != keyMap.end())
+            return keyMap[input];
+        return Action::None;
+    }
 
 public:
     InputHandler& operator=(const InputHandler&) = delete;
@@ -54,52 +91,36 @@ public:
         return *instance;
     }
 
+    static void bindKey(const char& key, const Action& action) {
+        keyMap[key] = action;
+    }
+
     void handleInput() {
         terminal.nonBlock(
             [&]() {
                 while (appState.getState()) {
-                    switch (Terminal::getChar()) {
-                        case keyMap(Action::Up):
-                            appState.decrementFileIndex();
+                    switch (getAction(Terminal::getChar())) {
+                        case Action::Up:
+                            handleUp();
                             break;
-
-                        case keyMap(Action::Down):
-                        case keyCode::Tab:
-                            appState.incrementFileIndex();
+                        case Action::Down:
+                            handleDown();
                             break;
-
-                        case keyMap(Action::Enter)://todo: use switch
-                            case keyCode::Enter:
-                            if (appState.getCurrentEntry().is_directory()) {
-                                fs::current_path(
-                                    fs::current_path() / FileProperties::getName(appState.getCurrentEntry())
-                                );
-                                appState.resetFileIndex();
-                            } else if (FileProperties::isExecutable(appState.getCurrentEntry())) {
-                                // TODO: implement
-                            } else if (appState.getCurrentEntry().is_regular_file()) {
-                                FileManager::openFile(
-                                    fs::current_path() / appState.getCurrentEntry().path().string()
-                                );
-                            }
+                        case Action::Enter:
+                            handleEnter();
                             break;
-
-                        case keyMap(Action::Back):
-                            FileManager::changeDirectory(fs::current_path() / "..");
-                            appState.resetFileIndex(); // TODO: make it stay at the same index
+                        case Action::Back:
+                            handleBack();
                             break;
-
-                        case keyMap(Action::Rename):
+                        case Action::Rename:
+                            handleRename();
                             break;
-
-                        case keyMap(Action::Delete):
+                        case Action::Delete:
+                            handleDelete();
                             break;
-
-                        case keyMap(Action::Quit):
-                        case keyCode::Esc:
-                            appState.setState(false);
+                        case Action::Quit:
+                            handleQuit();
                             break;
-
                         default:
                             break;
                     }

@@ -82,7 +82,7 @@ private:
         {".md", FileType::Markdown},
     };
 
-private:
+public:
     static EntryType determineEntryType(const fs::directory_entry& entry) {
         if (entry.is_directory())
             return EntryType::Directory;
@@ -101,7 +101,6 @@ private:
         return FileType::Unknown;
     }
 
-public:
     static Icon getIcon(const fs::directory_entry& entry) {
         if (determineEntryType(entry) == EntryType::RegularFile)
             return extensionIconMap[determineFileType(entry.path())];

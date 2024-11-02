@@ -49,8 +49,6 @@ public:
     }
 
     void renderTopBar() const {
-        Terminal::moveTo(1, 1); // todo: consider removing if not needed
-
         std::string topBar = "$ " + (fs::current_path() / app.getCurrentEntry().path().filename()).string();
         const auto lastSlashIndex = topBar.find_last_of(fs::path::preferred_separator);
 
@@ -67,7 +65,6 @@ public:
     }
 
     void renderEntries() const {
-        Terminal::moveTo(1, 2); // todo: consider removing if not needed
         for (int i = 0; i < app.getEntries().size(); ++i)
             printEntry(app.getEntries()[i], i == app.getFileIndex());
     }
