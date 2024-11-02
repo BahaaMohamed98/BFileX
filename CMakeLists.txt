@@ -15,4 +15,5 @@ add_executable(BfileX src/main.cpp
         src/BFileX.hpp
         src/FileProperties.hpp
 )
+
 add_executable(test src/test.cpp)

@@ -77,8 +77,8 @@ class InputHandler {
     }
 
     [[nodiscard]] static Action getAction(const char& input) {
-        if (keyMap.find(input) != keyMap.end())
-            return keyMap[input];
+        if (const auto it = keyMap.find(input); it != keyMap.end())
+            return it->second;
         return Action::None;
     }
 
