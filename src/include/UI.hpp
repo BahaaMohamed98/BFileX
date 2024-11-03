@@ -1,11 +1,10 @@
 #ifndef UI_HPP
 #define UI_HPP
 
-#include "AppState.hpp"
+#include "App.hpp"
 #include "Terminal++.hpp"
 
 class UI {
-    AppState& appState;
     int tWidth{};
     int tHeight{};
     int selectionWidth{};
@@ -19,11 +18,10 @@ public:
     UI();
     ~UI();
 
-    void renderTopBar() const;
-    void renderEntries();
-    void renderFooter() const;
+    void renderTopBar(const std::string& currentPath) const;
+    void renderEntries(const std::vector<fs::directory_entry>& entries, const size_t& currentIndex);
+    void renderFooter(App& app, const std::function<void()>& customFooter = nullptr) const;
     void resize(const int& nWidth, const int& nHeight);
-    void renderApp();
 };
 
 #endif // UI_HPP

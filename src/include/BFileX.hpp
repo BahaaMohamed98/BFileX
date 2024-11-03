@@ -6,11 +6,13 @@
 
 class BFileX {
     UI ui;
+    App& app;
     Terminal terminal;
-    AppState& appState;
     InputHandler& inputHandler;
 
     [[nodiscard]] bool terminalResized();
+
+    void renderApp() ;
 
 public:
     BFileX();

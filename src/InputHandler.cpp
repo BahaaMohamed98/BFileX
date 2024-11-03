@@ -5,30 +5,30 @@
 #include "FileProperties.hpp"
 
 InputHandler::InputHandler()
-    : appState(AppState::getInstance()) {}
+    : app(App::getInstance()) {}
 
 void InputHandler::handleUp() const {
-    appState.decrementEntryIndex();
+    app.decrementEntryIndex();
 }
 
 void InputHandler::handleDown() const {
-    appState.incrementEntryIndex();
+    app.incrementEntryIndex();
 }
 
 void InputHandler::handleEnter() const {
-    if (appState.getCurrentEntry().is_directory()) {
-        appState.changeDirectory(
-            fs::current_path() / FileProperties::getName(appState.getCurrentEntry())
+    if (app.getCurrentEntry().is_directory()) {
+        app.changeDirectory(
+            fs::current_path() / FileProperties::getName(app.getCurrentEntry())
         );
-    } else if (appState.getCurrentEntry().is_regular_file()) {
+    } else if (app.getCurrentEntry().is_regular_file()) {
         FileManager::openFile(
-            fs::current_path() / appState.getCurrentEntry().path().string()
+            fs::current_path() / app.getCurrentEntry().path().string()
         );
     }
 }
 
 void InputHandler::handleBack() const {
-    appState.changeDirectory(fs::current_path() / "..");
+    app.changeDirectory(fs::current_path() / "..");
 }
 
 // Todo: implement
@@ -37,7 +37,7 @@ void InputHandler::handleRename() const {}
 void InputHandler::handleDelete() const {}
 
 void InputHandler::handleQuit() const {
-    appState.quit();
+    app.quit();
 }
 
 [[nodiscard]] Action InputHandler::getAction(const char& input) {
@@ -59,7 +59,7 @@ void InputHandler::bindKey(const char& key, const Action& action) {
 void InputHandler::handleInput() {
     terminal.nonBlock(
         [&]() {
-            while (appState.isRunning()) {
+            while (app.isRunning()) {
                 switch (getAction(Terminal::getChar())) {
                     case Action::Up:
                         handleUp();

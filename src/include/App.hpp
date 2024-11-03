@@ -3,13 +3,12 @@
 
 #include <atomic>
 #include <filesystem>
-#include <functional>
 #include <unordered_map>
 #include "FileManager.hpp"
 
 namespace fs = std::filesystem;
 
-class AppState {
+class App {
     std::vector<fs::directory_entry> entries{};
     std::atomic<bool> isRunning_;
 
@@ -21,16 +20,14 @@ class AppState {
     SortType sortType;
 
     bool uiUpdated;
-    std::function<void()> footerFunction;
-    bool defaultFooter;
 
-    static AppState* instance;
+    static App* instance;
 
-    AppState();
+    App();
 
 public:
-    static AppState& getInstance();
-    AppState(const AppState&) = delete;
+    static App& getInstance();
+    App(const App&) = delete;
     [[nodiscard]] bool isRunning() const;
     void quit();
     [[nodiscard]] size_t getEntryIndex() const;
@@ -47,10 +44,6 @@ public:
     void setSortType(const SortType& sortType);
     [[nodiscard]] SortType getSortType() const;
     void changeDirectory(const fs::path& path);
-    void setFooter(const std::function<void()>& func);
-    void setDefaultFooter();
-    const std::function<void()>& getFooter();
-    [[nodiscard]] bool useDefaultFooter() const;
     bool shouldUpdateUI();
     void updateUI();
 };

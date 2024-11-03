@@ -1,31 +1,30 @@
 #ifndef APP_CPP
 #define APP_CPP
 
-#include "AppState.hpp"
+#include "App.hpp"
 #include "Terminal++.hpp"
 
-AppState::AppState()
+App::App()
     : isRunning_(true), entryIndex(0), reverseEntries(false), showHiddenFiles(false),
-      sortType(SortType::Normal),
-      uiUpdated(true), defaultFooter(true) {
+      sortType(SortType::Normal), uiUpdated(true) {
     updateEntries();
 }
 
-AppState& AppState::getInstance() {
+App& App::getInstance() {
     if (instance == nullptr)
-        instance = new AppState();
+        instance = new App();
     return *instance;
 }
 
-[[nodiscard]] bool AppState::isRunning() const {
+[[nodiscard]] bool App::isRunning() const {
     return isRunning_.load();
 }
 
-void AppState::quit() {
+void App::quit() {
     this->isRunning_.store(false);
 }
 
-void AppState::setEntryIndex(const size_t& index) {
+void App::setEntryIndex(const size_t& index) {
     if (index > entries.size()) {
         Terminal::clearScreen();
         Terminal(Color::Red).println("wowo");
@@ -35,16 +34,16 @@ void AppState::setEntryIndex(const size_t& index) {
     updateUI();
 }
 
-[[nodiscard]] size_t AppState::getEntryIndex() const {
+[[nodiscard]] size_t App::getEntryIndex() const {
     return entryIndex.load();
 }
 
-void AppState::incrementEntryIndex() {
+void App::incrementEntryIndex() {
     entryIndex = (entryIndex + 1) % static_cast<int>(entries.size());
     updateUI();
 }
 
-void AppState::decrementEntryIndex() {
+void App::decrementEntryIndex() {
     if (entryIndex == 0)
         entryIndex = static_cast<int>(entries.size()) - 1;
     else
@@ -52,11 +51,11 @@ void AppState::decrementEntryIndex() {
     updateUI();
 }
 
-fs::directory_entry& AppState::getCurrentEntry() {
+fs::directory_entry& App::getCurrentEntry() {
     return entries[entryIndex];
 }
 
-void AppState::updateEntries() {
+void App::updateEntries() {
     FileManager::setEntries(
         fs::current_path(),
         getEntries(),
@@ -67,35 +66,35 @@ void AppState::updateEntries() {
     updateUI();
 }
 
-std::vector<fs::directory_entry>& AppState::getEntries() {
+std::vector<fs::directory_entry>& App::getEntries() {
     return entries;
 }
 
-void AppState::setHiddenFiles(const bool& showHiddenFiles) {
+void App::setHiddenFiles(const bool& showHiddenFiles) {
     this->showHiddenFiles = showHiddenFiles;
 }
 
-[[nodiscard]] bool AppState::shouldShowHiddenEntries() const {
+[[nodiscard]] bool App::shouldShowHiddenEntries() const {
     return showHiddenFiles;
 }
 
-void AppState::setReverseEntries(const bool& reverseEntries) {
+void App::setReverseEntries(const bool& reverseEntries) {
     this->reverseEntries = reverseEntries;
 }
 
-[[nodiscard]] bool AppState::shouldReverseEntries() const {
+[[nodiscard]] bool App::shouldReverseEntries() const {
     return reverseEntries;
 }
 
-void AppState::setSortType(const SortType& sortType) {
+void App::setSortType(const SortType& sortType) {
     this->sortType = sortType;
 }
 
-[[nodiscard]] SortType AppState::getSortType() const {
+[[nodiscard]] SortType App::getSortType() const {
     return sortType;
 }
 
-void AppState::changeDirectory(const fs::path& path) {
+void App::changeDirectory(const fs::path& path) {
     // Save the index of the current path for the future
     entriesIndices[fs::current_path()] = entryIndex;
 
@@ -111,24 +110,7 @@ void AppState::changeDirectory(const fs::path& path) {
     updateUI();
 }
 
-void AppState::setFooter(const std::function<void()>& func) {
-    footerFunction = func;
-    defaultFooter = false;
-}
-
-void AppState::setDefaultFooter() {
-    defaultFooter = true;
-}
-
-const std::function<void()>& AppState::getFooter() {
-    return footerFunction;
-}
-
-bool AppState::useDefaultFooter() const {
-    return defaultFooter;
-}
-
-bool AppState::shouldUpdateUI() {
+bool App::shouldUpdateUI() {
     if (uiUpdated) {
         uiUpdated = false;
         return true;
@@ -136,10 +118,10 @@ bool AppState::shouldUpdateUI() {
     return false;
 }
 
-void AppState::updateUI() {
+void App::updateUI() {
     uiUpdated = true;
 }
 
-AppState* AppState::instance = nullptr;
+App* App::instance = nullptr;
 
 #endif //APP_CPP

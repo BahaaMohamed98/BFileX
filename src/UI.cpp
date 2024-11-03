@@ -4,8 +4,7 @@
 #include "UI.hpp"
 #include "FileProperties.hpp"
 
-UI::UI()
-    : appState(AppState::getInstance()) {
+UI::UI() {
     Terminal::setTitle("BFileX");
     Terminal::clearScreen();
     Terminal::hideCursor();
@@ -41,9 +40,8 @@ void UI::printEntry(const std::filesystem::directory_entry& entry, const bool& h
     Terminal(Color::Reset).println();
 }
 
-void UI::renderTopBar() const {
-    std::string topBar = "$ " + (std::filesystem::current_path() / FileProperties::getName(appState.getCurrentEntry())).
-                         string();
+void UI::renderTopBar(const std::string& currentPath) const {
+    std::string topBar = "$ " + currentPath;
     const auto lastSlashIndex = topBar.find_last_of(std::filesystem::path::preferred_separator);
 
     if (topBar.size() > tWidth)
@@ -58,9 +56,8 @@ void UI::renderTopBar() const {
         Terminal().println(topBar.substr(lastSlashIndex + 1));
 }
 
-void UI::renderEntries() {
-    const size_t currentIndex = appState.getEntryIndex();
-    const size_t totalEntries = appState.getEntries().size();
+void UI::renderEntries(const std::vector<fs::directory_entry>& entries, const size_t& currentIndex) {
+    const size_t totalEntries = entries.size();
     const size_t maxVisibleEntries = tHeight - 2; // display height for the entries
 
     // if there's nothing to render: return
@@ -79,32 +76,29 @@ void UI::renderEntries() {
     const size_t endIndex = std::min(startingIndex + maxVisibleEntries, totalEntries);
 
     // Render visible entries
-    const auto& entries = appState.getEntries();
     for (size_t i = startingIndex; i < endIndex; ++i) {
         printEntry(entries[i], i == currentIndex);
     }
 }
 
-void UI::renderFooter() const {
+void UI::renderFooter(App& app, const std::function<void()>& customFooter) const {
     Terminal::moveTo(1, Terminal::size().height);
 
-    if (!appState.useDefaultFooter()) {
-        appState.getFooter()();
-        return;
-    }
+    if (customFooter)
+        return customFooter();
 
-    const auto lastWriteTime = FileProperties::getLastWriteTime(appState.getCurrentEntry().path());
+    const auto lastWriteTime = FileProperties::getLastWriteTime(app.getCurrentEntry().path());
 
     Terminal().print(
-        appState.getCurrentEntry().is_directory() ? "d" : ".",           // print file type
-        FileProperties::permissionsToString(appState.getCurrentEntry()), // print permissions
+        app.getCurrentEntry().is_directory() ? "d" : ".",           // print file type
+        FileProperties::permissionsToString(app.getCurrentEntry()), // print permissions
         "  ",
         std::put_time(std::localtime(&lastWriteTime), "%a %b %e %r %Y") // Print formatted time
     );
 
     const std::string directoryNumber =
-            " " + std::to_string(appState.getEntryIndex() + 1) +
-            "/" + std::to_string(static_cast<int>(appState.getEntries().size()));
+            " " + std::to_string(app.getEntryIndex() + 1) +
+            "/" + std::to_string(static_cast<int>(app.getEntries().size()));
 
     Terminal::moveTo(tWidth - static_cast<int>(directoryNumber.length()) + 1, tHeight);
     Terminal().print(directoryNumber);
@@ -113,14 +107,6 @@ void UI::renderFooter() const {
 void UI::resize(const int& nWidth, const int& nHeight) {
     tWidth = nWidth, tHeight = nHeight;
     selectionWidth = tWidth / 2;
-}
-
-void UI::renderApp() {
-    Terminal::clearScreen();
-    renderTopBar();
-    renderEntries();
-    renderFooter();
-    Terminal::flush();
 }
 
 #endif // UI_CPP

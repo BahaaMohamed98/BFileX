@@ -1,7 +1,7 @@
 #ifndef INPUTHANDLER_HPP
 #define INPUTHANDLER_HPP
 
-#include "AppState.hpp"
+#include "App.hpp"
 #include "Terminal++.hpp"
 
 enum class Action {
@@ -17,7 +17,7 @@ enum class Action {
 
 class InputHandler {
     static InputHandler* instance;
-    AppState& appState;
+    App& app;
     Terminal terminal;
 
     static inline std::unordered_map<char, Action> keyMap{

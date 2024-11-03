@@ -13,10 +13,10 @@ add_executable(BfileX src/main.cpp
         src/include/UI.hpp
         src/include/FileManager.hpp
         src/include/InputHandler.hpp
-        src/include/AppState.hpp
+        src/include/App.hpp
         src/include/BFileX.hpp
         src/include/FileProperties.hpp
-        src/AppState.cpp
+        src/App.cpp
         src/BFileX.cpp
         src/FileManager.cpp
         src/InputHandler.cpp
