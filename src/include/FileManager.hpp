@@ -1,0 +1,40 @@
+#ifndef FILEMANAGER_HPP
+#define FILEMANAGER_HPP
+
+#include <filesystem>
+#include <vector>
+
+namespace fs = std::filesystem;
+
+enum class SortType {
+    None,
+    Normal,
+    Time,
+};
+
+class FileManager {
+    static bool applyReverse(const bool& condition, const bool& reverse) {
+        if (reverse)
+            return !condition;
+        return condition;
+    }
+
+    static void sortEntries(
+        std::vector<fs::directory_entry>& entries,
+        const SortType& sortType,
+        const bool& showHidden,
+        const bool& reverse
+    );
+
+public:
+    static void openFile(const std::string& filePath);
+    static void setEntries(
+        const fs::path& rootPath,
+        std::vector<fs::directory_entry>& entries,
+        const bool& showHidden,
+        const SortType& sortType,
+        const bool& reverse
+    );
+};
+
+#endif // FILEMANAGER_HPP
