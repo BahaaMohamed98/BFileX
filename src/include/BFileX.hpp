@@ -11,8 +11,7 @@ class BFileX {
     InputHandler& inputHandler;
 
     [[nodiscard]] bool terminalResized();
-
-    void renderApp() ;
+    void renderApp();
 
 public:
     BFileX();

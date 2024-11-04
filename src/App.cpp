@@ -6,8 +6,11 @@
 
 App::App()
     : isRunning_(true), entryIndex(0), reverseEntries(false), showHiddenFiles(false),
-      sortType(SortType::Normal), uiUpdated(true) {
+      showPreview(true), sortType(SortType::Normal),
+      uiUpdated(true), entriesUpdated(true) {
+
     updateEntries();
+    updateUI();
 }
 
 App& App::getInstance() {
@@ -25,11 +28,6 @@ void App::quit() {
 }
 
 void App::setEntryIndex(const size_t& index) {
-    if (index > entries.size()) {
-        Terminal::clearScreen();
-        Terminal(Color::Red).println("wowo");
-        exit(1);
-    }
     entryIndex.store(index);
     updateUI();
 }
@@ -63,6 +61,15 @@ void App::updateEntries() {
         getSortType(),
         shouldReverseEntries()
     );
+}
+
+void App::sortEntries() {
+    FileManager::sortEntries(
+        getEntries(),
+        getSortType(),
+        shouldShowHiddenEntries(),
+        shouldReverseEntries()
+    );
     updateUI();
 }
 
@@ -80,6 +87,7 @@ void App::setHiddenFiles(const bool& showHiddenFiles) {
 
 void App::setReverseEntries(const bool& reverseEntries) {
     this->reverseEntries = reverseEntries;
+    sortEntries();
 }
 
 [[nodiscard]] bool App::shouldReverseEntries() const {
@@ -88,6 +96,7 @@ void App::setReverseEntries(const bool& reverseEntries) {
 
 void App::setSortType(const SortType& sortType) {
     this->sortType = sortType;
+    sortEntries();
 }
 
 [[nodiscard]] SortType App::getSortType() const {
@@ -95,6 +104,9 @@ void App::setSortType(const SortType& sortType) {
 }
 
 void App::changeDirectory(const fs::path& path) {
+    // the current path is the previous parent if we go back
+    const fs::path previousParent = fs::current_path();
+
     // Save the index of the current path for the future
     entriesIndices[fs::current_path()] = entryIndex;
 
@@ -102,12 +114,27 @@ void App::changeDirectory(const fs::path& path) {
     updateEntries();        // get the new entries
 
     // if entry visited before get it's stored index
-    if (const auto it = entriesIndices.find(fs::current_path()); it != entriesIndices.end())
+    if (const auto it = entriesIndices.find(fs::current_path()); it != entriesIndices.end()) {
         entryIndex = it->second;
-    else
-        entryIndex = 0; // if not visited start at the begining
+    } else if (path.filename() == fs::path("..") and fs::current_path().has_parent_path()) {
+        // when going back highlight the parent of the current directory
+        entryIndex = [&]() {
+            int index{};
 
-    updateUI();
+            // we search for the previous' parent index in the current directory
+            // and set the current entry index to its index
+            for (const auto& entry : entries) {
+                if (entry.path() == previousParent)
+                    return index;
+                ++index;
+            }
+            return 0; // if somehow not found we return 0
+        }();
+    } else {
+        entryIndex = 0; // if not visited start at the begining
+    }
+
+    updateUI(); // updaing the ui after changing the entries
 }
 
 bool App::shouldUpdateUI() {
@@ -120,6 +147,15 @@ bool App::shouldUpdateUI() {
 
 void App::updateUI() {
     uiUpdated = true;
+}
+
+void App::setShowPreview(const bool& showPreview) {
+    updateUI();
+    this->showPreview.store(showPreview);
+}
+
+bool App::shouldShowPreview() const {
+    return showPreview.load();
 }
 
 App* App::instance = nullptr;

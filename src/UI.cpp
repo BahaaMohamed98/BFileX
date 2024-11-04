@@ -104,9 +104,15 @@ void UI::renderFooter(App& app, const std::function<void()>& customFooter) const
     Terminal().print(directoryNumber);
 }
 
+void UI::renderPreview(const std::string& filePath) {
+    preview.render(filePath);
+}
+
 void UI::resize(const int& nWidth, const int& nHeight) {
     tWidth = nWidth, tHeight = nHeight;
     selectionWidth = tWidth / 2;
+
+    preview.resize(tWidth, tHeight);
 }
 
 #endif // UI_CPP

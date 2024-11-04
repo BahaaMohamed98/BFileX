@@ -36,6 +36,17 @@ void InputHandler::handleRename() const {}
 
 void InputHandler::handleDelete() const {}
 
+void InputHandler::handleTogglePreview() const {
+    app.setShowPreview(!app.shouldShowPreview());
+}
+
+void InputHandler::handleSortByTime() const {
+    if (app.getSortType() != SortType::Time)
+        app.setSortType(SortType::Time);
+    else
+        app.setSortType(SortType::Normal);
+}
+
 void InputHandler::handleQuit() const {
     app.quit();
 }
@@ -78,6 +89,12 @@ void InputHandler::handleInput() {
                         break;
                     case Action::Delete:
                         handleDelete();
+                        break;
+                    case Action::TogglePreview:
+                        handleTogglePreview();
+                        break;
+                    case Action::ToggleSortByTime:
+                        handleSortByTime();
                         break;
                     case Action::Quit:
                         handleQuit();

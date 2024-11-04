@@ -2,12 +2,11 @@
 #define FILEPROPERTIES_CPP
 
 #include "FileProperties.hpp"
+#include <fstream>
 
-// Constructor implementations
 FileProperties::Icon::Icon(std::string icon) : representation(std::move(icon)) {}
 FileProperties::Icon::Icon() : representation(iconMap[EntryType::Unknown].representation) {}
 
-// Static member function implementations
 EntryType FileProperties::determineEntryType(const fs::directory_entry& entry) {
     if (entry.is_directory())
         return EntryType::Directory;
@@ -45,7 +44,45 @@ bool FileProperties::isHidden(const std::filesystem::directory_entry& entry) {
 }
 
 bool FileProperties::isExecutable(const std::filesystem::path& path) {
-    return (fs::status(path).permissions() & fs::perms::owner_exec) != fs::perms::none;
+    std::ifstream file(path, std::ios::binary); // Open the file in binary mode
+
+    if (!file.is_open())
+        return false; // Return false if the file cannot be opened
+
+    // Check for ELF magic number (Linux executables)
+    std::vector<unsigned char> elfBuffer(4);
+    file.read(reinterpret_cast<char*>(elfBuffer.data()), 4);
+
+    if (elfBuffer.size() == 4 &&
+        elfBuffer[0] == 0x7F &&
+        elfBuffer[1] == 'E' &&
+        elfBuffer[2] == 'L' &&
+        elfBuffer[3] == 'F') {
+        return true; // File is an ELF executable
+    }
+
+    // Reset the file position to read for PE magic number (Windows executables)
+    file.clear();  // Clear any error flags
+    file.seekg(0); // Move the file cursor back to the beginning
+
+    std::vector<char> peBuffer(2);
+    file.read(peBuffer.data(), 2);
+
+    // Check for PE magic number
+    return peBuffer.size() == 2 &&
+           peBuffer[0] == 'M' && peBuffer[1] == 'Z'; // File is a PE executable
+}
+
+bool FileProperties::isBinary(const std::string& path) {
+    std::ifstream file(path, std::ios::binary);
+    return file.is_open() &&
+           std::any_of(
+               std::istreambuf_iterator(file),
+               std::istreambuf_iterator<char>(),
+               [](unsigned char c) {
+                   return c < 0x20 && c != '\t' && c != '\n' && c != '\r';
+               }
+           );
 }
 
 std::string FileProperties::permissionsToString(const fs::directory_entry& entry) {

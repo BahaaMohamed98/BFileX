@@ -12,6 +12,8 @@ enum class Action {
     Back,
     Rename,
     Delete,
+    TogglePreview,
+    ToggleSortByTime,
     Quit,
 };
 
@@ -21,14 +23,16 @@ class InputHandler {
     Terminal terminal;
 
     static inline std::unordered_map<char, Action> keyMap{
-            {'k', Action::Up},
-            {'j', Action::Down}, {keyCode::Tab, Action::Down},
-            {'l', Action::Enter}, {keyCode::Enter, Action::Enter},
-            {'h', Action::Back},
-            {'r', Action::Rename},
-            {'d', Action::Delete},
-            {'q', Action::Quit}, {keyCode::Esc, Action::Quit},
-        };
+        {'k', Action::Up},
+        {'j', Action::Down}, {keyCode::Tab, Action::Down},
+        {'l', Action::Enter}, {keyCode::Enter, Action::Enter},
+        {'h', Action::Back},
+        {'r', Action::Rename},
+        {'d', Action::Delete},
+        {'p', Action::TogglePreview},
+        {'t', Action::ToggleSortByTime},
+        {'q', Action::Quit}, {keyCode::Esc, Action::Quit},
+    };
 
     InputHandler();
 
@@ -38,6 +42,8 @@ class InputHandler {
     void handleBack() const;
     void handleRename() const;
     void handleDelete() const;
+    void handleTogglePreview() const;
+    void handleSortByTime() const;
     void handleQuit() const;
 
     [[nodiscard]] static Action getAction(const char& input);

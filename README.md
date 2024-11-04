@@ -62,6 +62,8 @@ make
 | `k`            | Move up                   |
 | `l` or `Enter` | Open file/Enter directory |
 | `h`            | Go to parent directory    |
-| `q` or `Esc`   | Quit                      |
 | `r`            | Rename file/directory     |
 | `d`            | Delete file/directory     |
+| `p`            | Toggle preview            |
+| `t`            | Toggle sorting by time    |
+| `q` or `Esc`   | Quit                      |
