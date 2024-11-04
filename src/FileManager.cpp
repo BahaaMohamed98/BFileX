@@ -18,6 +18,7 @@ void FileManager::sortEntries(
                 return true;
             if (second.path().filename() == "..")
                 return false;
+
             if (sortType == SortType::Normal) {
                 if (showHidden) {
                     if (FileProperties::isHidden(first) && !FileProperties::isHidden(second))

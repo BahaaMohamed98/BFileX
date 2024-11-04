@@ -23,10 +23,10 @@ class InputHandler {
     Terminal terminal;
 
     static inline std::unordered_map<char, Action> keyMap{
-        {'k', Action::Up},
-        {'j', Action::Down}, {keyCode::Tab, Action::Down},
-        {'l', Action::Enter}, {keyCode::Enter, Action::Enter},
-        {'h', Action::Back},
+        {'k', Action::Up}, {keyCode::ArrowUp, Action::Up},
+        {'j', Action::Down}, {keyCode::ArrowDown, Action::Down}, {keyCode::Tab, Action::Down},
+        {'l', Action::Enter}, {keyCode::ArrowRight, Action::Enter}, {keyCode::Enter, Action::Enter},
+        {'h', Action::Back}, {keyCode::ArrowLeft, Action::Back},
         {'r', Action::Rename},
         {'d', Action::Delete},
         {'p', Action::TogglePreview},

@@ -1,6 +1,7 @@
 # BFileX
 
-A modern, lightweight terminal file explorer written in C++. BFileX provides an intuitive interface for navigating and managing your files with vim-style keybindings and a color-coded display.
+A modern, lightweight terminal file explorer written in C++. BFileX provides an intuitive interface for navigating and
+managing your files with vim-style keybindings and a color-coded display.
 
 ## ✨ Features
 
@@ -11,6 +12,7 @@ A modern, lightweight terminal file explorer written in C++. BFileX provides an 
 - 📊 Detailed file information (permissions, size, modified date)
 - 🖥️ Cross-platform support (Linux, macOS, Windows)
 - 🔄 Real-time updates for file system changes
+- ⬆️ Comprehensive keybindings for navigation and actions
 
 ## 🖼️ Screenshots
 
@@ -25,6 +27,7 @@ A modern, lightweight terminal file explorer written in C++. BFileX provides an 
 ## 🚀 Installation
 
 ### Prerequisites
+
 - C++17 or higher
 - CMake 3.15 or higher
 - Git
@@ -32,6 +35,7 @@ A modern, lightweight terminal file explorer written in C++. BFileX provides an 
 ### Build from Source
 
 #### Clone the repository
+
 ```bash
 
 git clone https://github.com/BahaaMohamed98/BfileX.git
@@ -39,31 +43,35 @@ cd BfileX
 ```
 
 #### Initialize submodules
+
 ```bash
 git submodule update --init --recursive
 ```
 
 #### Build using Cmake
+
 ```bash
 cd build
 cmake ..
 make
 ```
+
 #### Run the app
+
 ```bash
 ./BFileX
 ```
 
 ## 🎮 Default Keybindings
 
-| Key            | Action                    |
-|----------------|---------------------------|
-| `j` or `Tab`   | Move down                 |
-| `k`            | Move up                   |
-| `l` or `Enter` | Open file/Enter directory |
-| `h`            | Go to parent directory    |
-| `r`            | Rename file/directory     |
-| `d`            | Delete file/directory     |
-| `p`            | Toggle preview            |
-| `t`            | Toggle sorting by time    |
-| `q` or `Esc`   | Quit                      |
+| Key                        | Action                    |
+|----------------------------|---------------------------|
+| `j`, `Tab`, `Right Arrow`  | Move down                 |
+| `k`, `Up Arrow`            | Move up                   |
+| `l`, `Enter`,`Right Arrow` | Open file/Enter directory |
+| `h`, `Left arrow`          | Go to parent directory    |
+| `r`                        | Rename file/directory     |
+| `d`                        | Delete file/directory     |
+| `p`                        | Toggle preview            |
+| `t`                        | Toggle sorting by time    |
+| `q`, `Esc`                 | Quit                      |
