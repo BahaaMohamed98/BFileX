@@ -19,6 +19,7 @@ class FileManager {
         return condition;
     }
 
+public:
     static void sortEntries(
         std::vector<fs::directory_entry>& entries,
         const SortType& sortType,
@@ -26,7 +27,6 @@ class FileManager {
         const bool& reverse
     );
 
-public:
     static void openFile(const std::string& filePath);
     static void setEntries(
         const fs::path& rootPath,

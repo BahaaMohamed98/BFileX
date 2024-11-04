@@ -65,7 +65,7 @@ private:
         {FileType::Unknown, Icon(" ")},
     };
 
-    static inline std::unordered_multimap<std::string, FileType> extensionType{
+    static inline std::unordered_map<std::string, FileType> extensionType{
         {".txt", FileType::Text},
         {".cpp", FileType::Cpp},
         {".h", FileType::Header},
@@ -91,6 +91,7 @@ public:
     static Color getColor(const fs::directory_entry& entry);
     static bool isHidden(const std::filesystem::directory_entry& entry);
     static bool isExecutable(const std::filesystem::path& path);
+    static bool isBinary(const std::string& path);
     static std::string permissionsToString(const fs::directory_entry& entry);
     static fs::path getName(const fs::directory_entry& entry);
     static std::time_t getLastWriteTime(const fs::path& path);

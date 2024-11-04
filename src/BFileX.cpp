@@ -3,6 +3,7 @@
 
 #include "BFileX.hpp"
 #include "App.hpp"
+#include "FileProperties.hpp"
 #include "Terminal++.hpp"
 
 BFileX::BFileX()
@@ -18,9 +19,18 @@ bool BFileX::terminalResized() {
 
 void BFileX::renderApp() {
     Terminal::clearScreen();
+
     ui.renderTopBar((fs::current_path() / app.getCurrentEntry()).string());
     ui.renderEntries(app.getEntries(), app.getEntryIndex());
     ui.renderFooter(app);
+
+   // show preview if enabled
+    if (app.shouldShowPreview() and
+        FileProperties::determineEntryType(app.getCurrentEntry()) == EntryType::RegularFile and
+        !FileProperties::isBinary(app.getCurrentEntry().path().string()) // only show preview if it's normal text file
+    )
+        ui.renderPreview(FileProperties::getName(app.getCurrentEntry()).string());
+
     Terminal::flush();
 }
 
