@@ -22,7 +22,7 @@ void InputHandler::handleEnter() const {
         );
     } else if (app.getCurrentEntry().is_regular_file()) {
         FileManager::openFile(
-            fs::current_path() / app.getCurrentEntry().path().string()
+            (fs::current_path() / app.getCurrentEntry().path()).string()
         );
     }
 }

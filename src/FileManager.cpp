@@ -21,16 +21,17 @@ void FileManager::sortEntries(
 
             if (sortType == SortType::Normal) {
                 if (showHidden) {
-                    if (FileProperties::isHidden(first) && !FileProperties::isHidden(second))
-                        return applyReverse(true, reverse);
-                    if (!FileProperties::isHidden(first) && FileProperties::isHidden(second))
-                        return applyReverse(false, reverse);
+                    const bool firstHidden = FileProperties::isHidden(first);
+                    const bool secondHidden = FileProperties::isHidden(second);
+
+                    if (firstHidden != secondHidden)
+                        return applyReverse(firstHidden, reverse);
                 }
 
-                if (first.is_directory() && !second.is_directory())
-                    return applyReverse(true, reverse);
-                if (!first.is_directory() && second.is_directory())
-                    return applyReverse(false, reverse);
+                const bool firstIsDir = first.is_directory();
+                const bool secondIsDir = second.is_directory();
+                if (firstIsDir != secondIsDir)
+                    return applyReverse(firstIsDir, reverse);
 
                 const std::string a = first.path().string(), b = second.path().string();
                 return std::lexicographical_compare(

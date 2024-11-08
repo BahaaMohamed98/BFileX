@@ -5,6 +5,7 @@
 #include "FileProperties.hpp"
 
 UI::UI() {
+    Terminal::enableAlternateScreen(); // uses the alternate screen buffer
     Terminal::setTitle("BFileX");
     Terminal::clearScreen();
     Terminal::hideCursor();
@@ -16,6 +17,7 @@ UI::UI() {
 
 UI::~UI() {
     Terminal::showCursor();
+    Terminal::disableAlternateScreen();
 }
 
 void UI::printEntry(const std::filesystem::directory_entry& entry, const bool& highlight) const {
