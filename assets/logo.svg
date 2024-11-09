@@ -9,13 +9,16 @@
             <stop offset="0" style="stop-color:#3079D6"/>
             <stop offset="1" style="stop-color:#297CD2"/>
         </linearGradient>
+        <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="rgba(0,0,0,0.5)" />
+        </filter>
     </defs>
 
     <!-- File Icon Body -->
     <rect x="90" y="40" width="80" height="120" rx="8" fill="url(#fileGradient)"/>
 
-    <!-- Text -->
-    <text x="230" y="120" fill="#FFFFFF" font-family="monospace" font-size="48" text-anchor="middle" font-weight="bold">
+    <!-- Text with Shadow -->
+    <text x="230" y="120" fill="#FFFFFF" font-family="monospace" font-size="48" text-anchor="middle" font-weight="bold" filter="url(#shadow)">
         BFileX
     </text>
 </svg>
