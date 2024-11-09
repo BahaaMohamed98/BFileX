@@ -3,6 +3,7 @@
 <div align="center">
   <img src="assets/logo.svg" alt="Terminal++ Logo" width="600" style="margin: 20px 0"/>
 </div>
+<br>
 
 A modern, lightweight terminal file explorer written in C++. BFileX provides an intuitive interface for navigating and
 managing your files with vim-style keybindings and a color-coded display.
