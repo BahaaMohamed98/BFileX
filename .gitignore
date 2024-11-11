@@ -1,8 +1,8 @@
 .idea
 cmake-build-release
 cmake-build-debug
-src/test.cpp
 build/test
 build/Build
-src/Build.cpp
 build/tmp
+src/Build.cpp
+src/test.cpp
