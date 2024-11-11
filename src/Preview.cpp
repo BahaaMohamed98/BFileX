@@ -1,6 +1,5 @@
 #include "Preview.hpp"
 #include <fstream>
-#include "FileProperties.hpp"
 
 void Preview::readFile(const std::string& path) {
     lines.clear(); // clear previous file
@@ -15,7 +14,7 @@ void Preview::readFile(const std::string& path) {
     std::string line;
     // read maxLines number of lines or less
     for (int i = 0; getline(file, line) and i < maxLines; ++i) {
-        // triming the part more than maxLineWidth
+        // trimming the part more than maxLineWidth
         if (line.size() > maxLineWidth)
             line = line.substr(0, maxLineWidth);
 

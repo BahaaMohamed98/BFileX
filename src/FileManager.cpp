@@ -13,7 +13,7 @@ void FileManager::sortEntries(
     std::sort(
         entries.begin(), entries.end(),
         [&](const fs::directory_entry& first, const fs::directory_entry& second) {
-            // rank the previous directory .. at the top
+            // rank the previous directory ".." at the top
             if (first.path().filename() == "..")
                 return true;
             if (second.path().filename() == "..")
@@ -73,7 +73,7 @@ void FileManager::setEntries(
 ) {
     entries.clear(); // clear previous entries
 
-    entries.emplace_back(".."); // add previous directory at the beginning
+    entries.emplace_back(".."); // add the previous directory at the beginning
 
     for (const auto& item : fs::directory_iterator(rootPath)) {
         if (showHidden || !FileProperties::isHidden(item))

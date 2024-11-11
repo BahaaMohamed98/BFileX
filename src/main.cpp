@@ -1,6 +1,6 @@
 #include "BFileX.hpp"
 
 int main() {
-    BFileX Bfilex;
-    Bfilex.run();
+    BFileX BFileX;
+    BFileX.run();
 }

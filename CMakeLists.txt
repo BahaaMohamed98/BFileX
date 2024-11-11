@@ -24,5 +24,4 @@ add_executable(BFileX src/main.cpp
         src/UI.cpp
         src/Preview.cpp
         src/include/Preview.hpp
-        src/test.cpp
 )

@@ -20,7 +20,7 @@ EntryType FileProperties::determineEntryType(const fs::directory_entry& entry) {
 }
 
 FileType FileProperties::determineFileType(const fs::path& filePath) {
-    if (const auto it = extensionType.find(filePath.extension()); it != extensionType.end())
+    if (const auto it = extensionType.find(filePath.extension().string()); it != extensionType.end())
         return it->second;
     return FileType::Unknown;
 }
@@ -89,21 +89,21 @@ std::string FileProperties::permissionsToString(const fs::directory_entry& entry
     std::string ret;
 
     const auto permissions = fs::status(entry.path()).permissions();
-    auto appendPermsission = [&](const std::string& ch, const fs::perms& permission) {
+    auto appendPermission = [&](const std::string& ch, const fs::perms& permission) {
         ret.append(
             (permissions & permission) == fs::perms::none ? "-" : ch
         );
     };
 
-    appendPermsission("r", fs::perms::owner_read);
-    appendPermsission("w", fs::perms::owner_write);
-    appendPermsission("x", fs::perms::owner_exec);
-    appendPermsission("r", fs::perms::group_read);
-    appendPermsission("w", fs::perms::group_write);
-    appendPermsission("x", fs::perms::group_exec);
-    appendPermsission("r", fs::perms::others_read);
-    appendPermsission("w", fs::perms::others_write);
-    appendPermsission("x", fs::perms::others_exec);
+    appendPermission("r", fs::perms::owner_read);
+    appendPermission("w", fs::perms::owner_write);
+    appendPermission("x", fs::perms::owner_exec);
+    appendPermission("r", fs::perms::group_read);
+    appendPermission("w", fs::perms::group_write);
+    appendPermission("x", fs::perms::group_exec);
+    appendPermission("r", fs::perms::others_read);
+    appendPermission("w", fs::perms::others_write);
+    appendPermission("x", fs::perms::others_exec);
 
     return ret;
 }
