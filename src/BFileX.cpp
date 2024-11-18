@@ -1,3 +1,4 @@
+#include <csignal>
 #ifndef BFILEX_CPP
 #define BFILEX_CPP
 
@@ -8,6 +9,12 @@
 
 BFileX::BFileX()
     : app(App::getInstance()), inputHandler(InputHandler::getInstance()) {}
+
+void BFileX::signalHandler(int signal) {
+    Terminal::showCursor();
+    Terminal::disableAlternateScreen();
+    exit(0);
+}
 
 bool BFileX::terminalResized() {
     if (int nWidth, nHeight; terminal.isResized(nWidth, nHeight)) {
@@ -24,7 +31,7 @@ void BFileX::renderApp() {
     ui.renderEntries(app.getEntries(), app.getEntryIndex());
     ui.renderFooter(app);
 
-   // show preview if enabled
+    // show preview if enabled
     if (app.shouldShowPreview() and
         FileProperties::determineEntryType(app.getCurrentEntry()) == EntryType::RegularFile and
         !FileProperties::isBinary(app.getCurrentEntry().path().string()) // only show preview if it's normal text file
@@ -35,6 +42,10 @@ void BFileX::renderApp() {
 }
 
 void BFileX::run() {
+    // setup signal handling
+    signal(SIGINT, signalHandler);
+    signal(SIGTERM, signalHandler);
+
     inputHandler.handleInput();
 
     while (app.isRunning()) {

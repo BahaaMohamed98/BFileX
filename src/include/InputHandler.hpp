@@ -36,7 +36,7 @@ class InputHandler {
         {'t', Action::ToggleSortByTime},
         {'m', Action::MakeDirectory},
         {'H', Action::ToggleHideEntries},
-        {'q', Action::Quit}, {keyCode::Esc, Action::Quit},
+        {'q', Action::Quit},
     };
 
     InputHandler();

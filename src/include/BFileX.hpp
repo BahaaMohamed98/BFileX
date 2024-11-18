@@ -10,6 +10,7 @@ class BFileX {
     Terminal terminal;
     InputHandler& inputHandler;
 
+    static void signalHandler(int);
     [[nodiscard]] bool terminalResized();
     void renderApp();
 
