@@ -10,13 +10,14 @@ managing your files with vim-style keybindings and a color-coded display.
 ## ✨ Features
 
 - 🎨 Color-coded interface for different file types
-- 📁 Vim-style navigation
+- 𝐕I Vim-style navigation
 - 🚀 Fast and lightweight
 - 🔍 File type detection with custom icons
 - 📊 Detailed file information (permissions, size, modified date)
 - 🖥️ Cross-platform support (Linux, macOS, Windows)
 - 🔄 Real-time updates for file system changes
 - ⬆️ Comprehensive keybindings for navigation and actions
+- 📁 Directory management: Create, rename, and delete directories on the fly
 
 ## 🖼️ Screenshots
 
@@ -33,8 +34,8 @@ managing your files with vim-style keybindings and a color-coded display.
 ### Prerequisites
 
 - C++17 or higher
-- CMake 3.15 or higher
-- Git
+    - CMake 3.15 or higher
+    - Git
 
 ### Build from Source
 
@@ -57,7 +58,7 @@ git submodule update --init --recursive
 ```bash
 cd build
 cmake ..
-make
+cmake --build .
 ```
 
 #### Run the app
@@ -68,14 +69,20 @@ make
 
 ## 🎮 Default Keybindings
 
-| Key                        | Action                    |
-|----------------------------|---------------------------|
-| `j`, `Tab`, `Right Arrow`  | Move down                 |
-| `k`, `Up Arrow`            | Move up                   |
-| `l`, `Enter`,`Right Arrow` | Open file/Enter directory |
-| `h`, `Left arrow`          | Go to parent directory    |
-| `r`                        | Rename file/directory     |
-| `d`                        | Delete file/directory     |
-| `p`                        | Toggle preview            |
-| `t`                        | Toggle sorting by time    |
-| `q`, `Esc`                 | Quit                      |
+| Key                                                   | Action                        |
+|-------------------------------------------------------|-------------------------------|
+| <kbd>j</kbd>, <kbd>Tab</kbd>, <kbd>Right Arrow</kbd>  | Move down                     |
+| <kbd>k</kbd>, <kbd>Up Arrow</kbd>                     | Move up                       |
+| <kbd>l</kbd>, <kbd>Enter</kbd>,<kbd>Right Arrow</kbd> | Open file/directory           |
+| <kbd>h</kbd>, <kbd>Left arrow</kbd>                   | Go to parent directory        |
+| <kbd>r</kbd>                                          | Rename current entry          |
+| <kbd>d</kbd>                                          | Delete current entry          |
+| <kbd>p</kbd>                                          | Toggle preview                |
+| <kbd>t</kbd>                                          | Toggle sorting by time        |
+| <kbd>m</kbd>                                          | Make a new directory          |
+| <kbd>H</kbd>                                          | Toggle showing hidden entries |
+| <kbd>q</kbd>                                          | Quit                          |
+
+## 📄 License
+
+This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details.
