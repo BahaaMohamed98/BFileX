@@ -35,6 +35,10 @@ Color FileProperties::getColor(const fs::directory_entry& entry) {
     return colorMap[determineEntryType(entry)];
 }
 
+Color FileProperties::getColor(const EntryType& entryType) {
+    return colorMap[entryType];
+}
+
 bool FileProperties::isHidden(const std::filesystem::directory_entry& entry) {
 #ifdef _WIN32 // For Windows
     return (GetFileAttributesW(entry.path().wstring().c_str()) & FILE_ATTRIBUTE_HIDDEN) != 0;

@@ -83,11 +83,11 @@ void UI::renderEntries(const std::vector<fs::directory_entry>& entries, const si
     }
 }
 
-void UI::renderFooter(App& app, const std::function<void()>& customFooter) const {
+void UI::renderFooter(App& app) const {
     Terminal::moveTo(1, Terminal::size().height);
 
-    if (customFooter)
-        return customFooter();
+    if (app.getCustomFooter() != nullptr)
+        return app.getCustomFooter()();
 
     const auto lastWriteTime = FileProperties::getLastWriteTime(app.getCurrentEntry().path());
 

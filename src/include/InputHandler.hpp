@@ -2,6 +2,7 @@
 #define INPUTHANDLER_HPP
 
 #include "App.hpp"
+#include "FileProperties.hpp"
 #include "Terminal++.hpp"
 
 enum class Action {
@@ -14,6 +15,7 @@ enum class Action {
     Delete,
     TogglePreview,
     ToggleSortByTime,
+    MakeDirectory,
     Quit,
 };
 
@@ -31,6 +33,7 @@ class InputHandler {
         {'d', Action::Delete},
         {'p', Action::TogglePreview},
         {'t', Action::ToggleSortByTime},
+        {'m', Action::MakeDirectory},
         {'q', Action::Quit}, {keyCode::Esc, Action::Quit},
     };
 
@@ -44,15 +47,17 @@ class InputHandler {
     void handleDelete() const;
     void handleTogglePreview() const;
     void handleSortByTime() const;
+    void handleMakeDirectory() const;
     void handleQuit() const;
 
     [[nodiscard]] static Action getAction(const char& input);
+    [[nodiscard]] bool confirmAction(const std::string& prompt, const Color& color = Color::Red) const;
+    bool readInputString(const std::string& prompt, std::string& inputBuffer, EntryType entryType) const;
 
 public:
     InputHandler& operator=(const InputHandler&) = delete;
 
     static InputHandler& getInstance();
-    static void bindKey(const char& key, const Action& action);
     void handleInput();
 };
 

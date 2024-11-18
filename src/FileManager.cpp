@@ -73,15 +73,31 @@ void FileManager::setEntries(
 ) {
     entries.clear(); // clear previous entries
 
-    entries.emplace_back(".."); // add the previous directory at the beginning
+    entries.emplace_back(".."); // add the previous directory `..`
 
     for (const auto& item : fs::directory_iterator(rootPath)) {
-        if (showHidden || !FileProperties::isHidden(item))
+        // if hidden files are allowed or file is not hidden add to the entries
+        if (showHidden or !FileProperties::isHidden(item))
             entries.push_back(item);
     }
 
+    // sort the entries according to the sort type
     if (sortType != SortType::None)
         sortEntries(entries, sortType, showHidden, reverse);
+}
+
+// returns the index of a path in a given vector of entries
+int FileManager::getIndex(const fs::path& target, const std::vector<fs::directory_entry>& entries) {
+    int index{};
+
+    for (const auto& entry : entries) {
+        if (entry.path() == target)
+            return index;
+        ++index;
+    }
+
+    //  return 0 if not found
+    return 0;
 }
 
 #endif //FILEMANAGER_CPP

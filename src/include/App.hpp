@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <filesystem>
+#include <functional>
 #include <unordered_map>
 #include "FileManager.hpp"
 
@@ -19,6 +20,8 @@ class App {
     bool showHiddenFiles;
     std::atomic<bool> showPreview;
     SortType sortType;
+
+    std::function<void()> customFooter;
 
     bool uiUpdated;
     bool entriesUpdated;
@@ -56,6 +59,9 @@ public:
     void setSortType(const SortType& sortType);
     [[nodiscard]] SortType getSortType() const;
 
+    void setCustomFooter(const std::function<void()>& customFooter);
+    void resetFooter();
+    const std::function<void()>& getCustomFooter() const;
 
     void updateUI();
     bool shouldUpdateUI();

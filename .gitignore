@@ -6,3 +6,4 @@ build/Build
 build/tmp
 src/Build.cpp
 src/test.cpp
+countLines.zsh

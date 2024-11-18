@@ -6,7 +6,7 @@
 
 App::App()
     : isRunning_(true), entryIndex(0), reverseEntries(false), showHiddenFiles(false),
-      showPreview(true), sortType(SortType::Normal),
+      showPreview(true), sortType(SortType::Normal), customFooter(nullptr),
       uiUpdated(true), entriesUpdated(true) {
 
     updateEntries();
@@ -37,20 +37,21 @@ void App::setEntryIndex(const size_t& index) {
 }
 
 void App::incrementEntryIndex() {
-    entryIndex = (entryIndex + 1) % static_cast<int>(entries.size());
+    setEntryIndex((getEntryIndex() + 1) % static_cast<int>(entries.size()));
     updateUI();
 }
 
 void App::decrementEntryIndex() {
-    if (entryIndex == 0)
-        entryIndex = static_cast<int>(entries.size()) - 1;
-    else
-        --entryIndex;
+    if (getEntryIndex() == 0) {
+        setEntryIndex(static_cast<int>(entries.size()) - 1);
+    } else {
+        setEntryIndex(getEntryIndex() - 1);
+    }
     updateUI();
 }
 
 fs::directory_entry& App::getCurrentEntry() {
-    return entries[entryIndex];
+    return entries[getEntryIndex()];
 }
 
 void App::updateEntries() {
@@ -103,35 +104,40 @@ void App::setSortType(const SortType& sortType) {
     return sortType;
 }
 
+void App::setCustomFooter(const std::function<void()>& customFooter) {
+    this->customFooter = customFooter;
+    updateUI();
+}
+
+void App::resetFooter() {
+    customFooter = nullptr;
+}
+
+const std::function<void()>& App::getCustomFooter() const {
+    return customFooter;
+}
+
 void App::changeDirectory(const fs::path& path) {
     // the current path is the previous parent if we go back
     const fs::path previousParent = fs::current_path();
 
     // Save the index of the current path for the future
-    entriesIndices[fs::current_path()] = entryIndex;
+    entriesIndices[fs::current_path()] = getEntryIndex();
 
     fs::current_path(path); // change directory
     updateEntries();        // get the new entries
 
     // if entry visited before get it's stored index
     if (const auto it = entriesIndices.find(fs::current_path()); it != entriesIndices.end()) {
-        entryIndex = it->second;
+        setEntryIndex(it->second);
     } else if (path.filename() == fs::path("..") and fs::current_path().has_parent_path()) {
         // when going back highlight the parent of the current directory
-        entryIndex = [&]() {
-            int index{};
 
-            // we search for the previous' parent index in the current directory
-            // and set the current entry index to its index
-            for (const auto& entry : entries) {
-                if (entry.path() == previousParent)
-                    return index;
-                ++index;
-            }
-            return 0; // if somehow not found we return 0
-        }();
+        // we search for the previous' parent index in the current directory
+        // and set the current entry index to its index
+        setEntryIndex(FileManager::getIndex(previousParent, entries));
     } else {
-        entryIndex = 0; // if not visited start at the begining
+        setEntryIndex(0); // if not visited start at the begining
     }
 
     updateUI(); // updaing the ui after changing the entries
