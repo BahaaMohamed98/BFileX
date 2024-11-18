@@ -1,6 +1,3 @@
-#ifndef FILEPROPERTIES_CPP
-#define FILEPROPERTIES_CPP
-
 #include "FileProperties.hpp"
 #include <fstream>
 
@@ -130,5 +127,3 @@ std::time_t FileProperties::getLastWriteTime(const fs::path& path) {
 std::size_t std::hash<FileProperties::Icon>::operator()(const FileProperties::Icon& icon) const noexcept {
     return std::hash<std::string>()(icon.representation);
 }
-
-#endif // FILEPROPERTIES_CPP

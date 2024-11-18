@@ -1,5 +1,4 @@
-#ifndef BFILEX_HPP
-#define BFILEX_HPP
+#pragma once
 
 #include "InputHandler.hpp"
 #include "UI.hpp"
@@ -18,5 +17,3 @@ public:
     BFileX();
     void run();
 };
-
-#endif // BFILEX_HPP

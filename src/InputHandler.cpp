@@ -1,6 +1,3 @@
-#ifndef INPUTHANDLER_CPP
-#define INPUTHANDLER_CPP
-
 #include "InputHandler.hpp"
 
 InputHandler::InputHandler()
@@ -289,5 +286,3 @@ void InputHandler::handleInput() {
 }
 
 InputHandler* InputHandler::instance = nullptr;
-
-#endif // INPUTHANDLER_CPP

@@ -1,6 +1,3 @@
-#ifndef APP_CPP
-#define APP_CPP
-
 #include "App.hpp"
 #include "Terminal++.hpp"
 
@@ -166,5 +163,3 @@ bool App::shouldShowPreview() const {
 }
 
 App* App::instance = nullptr;
-
-#endif //APP_CPP

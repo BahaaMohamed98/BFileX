@@ -1,5 +1,4 @@
-#ifndef FILEMANAGER_HPP
-#define FILEMANAGER_HPP
+#pragma once
 
 #include <filesystem>
 #include <vector>
@@ -39,5 +38,3 @@ public:
 
     static int getIndex(const fs::path& target, const std::vector<fs::directory_entry>& entries);
 };
-
-#endif // FILEMANAGER_HPP

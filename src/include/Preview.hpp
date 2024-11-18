@@ -1,5 +1,4 @@
-#ifndef PREVIEW_HPP
-#define PREVIEW_HPP
+#pragma once
 
 #include "Terminal++.hpp"
 
@@ -29,5 +28,3 @@ public:
     void resize(const int& width, const int& height);
     void render(const std::string& filePath);
 };
-
-#endif //PREVIEW_HPP

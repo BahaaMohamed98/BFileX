@@ -1,5 +1,4 @@
-#ifndef FILEPROPERTIES_HPP
-#define FILEPROPERTIES_HPP
+#pragma once
 
 #include <filesystem>
 #include "Terminal++.hpp"
@@ -103,5 +102,3 @@ template<>
 struct std::hash<FileProperties::Icon> {
     std::size_t operator()(const FileProperties::Icon& icon) const noexcept;
 };
-
-#endif // FILEPROPERTIES_HPP

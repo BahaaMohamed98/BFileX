@@ -1,5 +1,4 @@
-#ifndef APP_HPP
-#define APP_HPP
+#pragma once
 
 #include <atomic>
 #include <filesystem>
@@ -69,5 +68,3 @@ public:
     void setShowPreview(const bool& showPreview);
     [[nodiscard]] bool shouldShowPreview() const;
 };
-
-#endif //APP_HPP

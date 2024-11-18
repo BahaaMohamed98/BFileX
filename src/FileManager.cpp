@@ -1,6 +1,3 @@
-#ifndef FILEMANAGER_CPP
-#define FILEMANAGER_CPP
-
 #include "FileManager.hpp"
 #include "FileProperties.hpp"
 
@@ -99,5 +96,3 @@ int FileManager::getIndex(const fs::path& target, const std::vector<fs::director
     //  return 0 if not found
     return 0;
 }
-
-#endif //FILEMANAGER_CPP

@@ -1,8 +1,5 @@
-#include <csignal>
-#ifndef BFILEX_CPP
-#define BFILEX_CPP
-
 #include "BFileX.hpp"
+#include <csignal>
 #include "App.hpp"
 #include "FileProperties.hpp"
 #include "Terminal++.hpp"
@@ -55,5 +52,3 @@ void BFileX::run() {
             renderApp();
     }
 }
-
-#endif // BFILEX_CPP

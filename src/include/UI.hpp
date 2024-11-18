@@ -1,5 +1,4 @@
-#ifndef UI_HPP
-#define UI_HPP
+#pragma once
 
 #include "App.hpp"
 #include "Preview.hpp"
@@ -27,5 +26,3 @@ public:
     void renderPreview(const std::string& filePath);
     void resize(const int& nWidth, const int& nHeight);
 };
-
-#endif // UI_HPP

@@ -1,6 +1,3 @@
-#ifndef UI_CPP
-#define UI_CPP
-
 #include "UI.hpp"
 #include "FileProperties.hpp"
 
@@ -116,5 +113,3 @@ void UI::resize(const int& nWidth, const int& nHeight) {
 
     preview.resize(tWidth, tHeight);
 }
-
-#endif // UI_CPP

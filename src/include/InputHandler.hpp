@@ -1,5 +1,4 @@
-#ifndef INPUTHANDLER_HPP
-#define INPUTHANDLER_HPP
+#pragma once
 
 #include "App.hpp"
 #include "FileProperties.hpp"
@@ -63,5 +62,3 @@ public:
     static InputHandler& getInstance();
     void handleInput();
 };
-
-#endif // INPUTHANDLER_HPP
