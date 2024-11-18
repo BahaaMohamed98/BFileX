@@ -87,7 +87,7 @@ void InputHandler::handleDelete() const {
         return;
 
     // return if the answer is not yes
-    if (!confirmAction("Are you sure you want to delete " + std::string{targetEntry} + "? (y/n) "))
+    if (!confirmAction("Are you sure you want to delete \"" + std::string{targetEntry} + "\"? (y/n) "))
         return app.resetFooter();
 
     try {
@@ -186,7 +186,8 @@ bool InputHandler::confirmAction(const std::string& prompt, const Color& color) 
 
 // gets input from the user interactively into the buffer
 // return true on success false if user cancelled
-bool InputHandler::readInputString(const std::string& prompt, std::string& inputBuffer, const EntryType entryType) const {
+bool InputHandler::readInputString(const std::string& prompt, std::string& inputBuffer,
+                                   const EntryType entryType) const {
     Terminal::showCursor();
 
     app.setCustomFooter([&] {

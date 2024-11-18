@@ -10,7 +10,6 @@ App::App()
       uiUpdated(true), entriesUpdated(true) {
 
     updateEntries();
-    updateUI();
 }
 
 App& App::getInstance() {
@@ -38,7 +37,6 @@ void App::setEntryIndex(const size_t& index) {
 
 void App::incrementEntryIndex() {
     setEntryIndex((getEntryIndex() + 1) % static_cast<int>(entries.size()));
-    updateUI();
 }
 
 void App::decrementEntryIndex() {
@@ -47,7 +45,6 @@ void App::decrementEntryIndex() {
     } else {
         setEntryIndex(getEntryIndex() - 1);
     }
-    updateUI();
 }
 
 fs::directory_entry& App::getCurrentEntry() {
@@ -110,7 +107,7 @@ void App::setCustomFooter(const std::function<void()>& customFooter) {
 }
 
 void App::resetFooter() {
-    customFooter = nullptr;
+    setCustomFooter(nullptr);
 }
 
 const std::function<void()>& App::getCustomFooter() const {
