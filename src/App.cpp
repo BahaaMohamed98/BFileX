@@ -5,7 +5,7 @@
 #include "Terminal++.hpp"
 
 App::App()
-    : isRunning_(true), entryIndex(0), reverseEntries(false), showHiddenFiles(false),
+    : isRunning_(true), entryIndex(0), reverseEntries(false), showHiddenEntries(false),
       showPreview(true), sortType(SortType::Normal), customFooter(nullptr),
       uiUpdated(true), entriesUpdated(true) {
 
@@ -59,6 +59,10 @@ void App::updateEntries() {
         getSortType(),
         shouldReverseEntries()
     );
+
+    // update the index to be the min between the previous index and the largest index
+    setEntryIndex(std::min(getEntryIndex(), getEntries().size() - 1));
+    updateUI();
 }
 
 void App::sortEntries() {
@@ -75,12 +79,12 @@ std::vector<fs::directory_entry>& App::getEntries() {
     return entries;
 }
 
-void App::setHiddenFiles(const bool& showHiddenFiles) {
-    this->showHiddenFiles = showHiddenFiles;
+void App::setHiddenEntries(const bool& showHiddenFiles) {
+    this->showHiddenEntries = showHiddenFiles;
 }
 
 [[nodiscard]] bool App::shouldShowHiddenEntries() const {
-    return showHiddenFiles;
+    return showHiddenEntries;
 }
 
 void App::setReverseEntries(const bool& reverseEntries) {
@@ -153,8 +157,8 @@ void App::updateUI() {
 }
 
 void App::setShowPreview(const bool& showPreview) {
-    updateUI();
     this->showPreview.store(showPreview);
+    updateUI();
 }
 
 bool App::shouldShowPreview() const {

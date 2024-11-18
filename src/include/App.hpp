@@ -17,7 +17,7 @@ class App {
     std::unordered_map<fs::path, size_t> entriesIndices;
 
     bool reverseEntries;
-    bool showHiddenFiles;
+    bool showHiddenEntries;
     std::atomic<bool> showPreview;
     SortType sortType;
 
@@ -50,7 +50,7 @@ public:
     void updateEntries();
     void sortEntries();
 
-    void setHiddenFiles(const bool& showHiddenFiles);
+    void setHiddenEntries(const bool& showHiddenFiles);
     [[nodiscard]] bool shouldShowHiddenEntries() const;
 
     void setReverseEntries(const bool& reverseEntries);

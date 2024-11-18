@@ -119,9 +119,6 @@ void InputHandler::handleDelete() const {
 
         // refresh entries
         app.updateEntries();
-
-        // update the index to be the min between the previous index and the largest index
-        app.setEntryIndex(std::min(app.getEntryIndex(), app.getEntries().size() - 1));
     } catch (...) {
         app.setCustomFooter([] {
             Terminal(Color::Red).setStyle(Style::Bold).print("Failed to delete entry!");
@@ -134,10 +131,11 @@ void InputHandler::handleTogglePreview() const {
 }
 
 void InputHandler::handleSortByTime() const {
-    if (app.getSortType() != SortType::Time)
+    if (app.getSortType() != SortType::Time) {
         app.setSortType(SortType::Time);
-    else
+    } else {
         app.setSortType(SortType::Normal);
+    }
 }
 
 void InputHandler::handleMakeDirectory() const {
@@ -154,10 +152,14 @@ void InputHandler::handleMakeDirectory() const {
         app.updateEntries();
     } else {
         app.setCustomFooter([] {
-            // todo: improve error message (maybe an api error)
-            Terminal(Color::Red).setStyle(Style::Bold).print("Directory already exists!");
+            Terminal(Color::Red).setStyle(Style::Bold).print("Failed to create directory!");
         });
     }
+}
+
+void InputHandler::handleToggleHideEntries() const {
+    app.setHiddenEntries(!app.shouldShowHiddenEntries());
+    app.updateEntries();
 }
 
 void InputHandler::handleQuit() const {
@@ -264,6 +266,9 @@ void InputHandler::handleInput() {
                     case Action::MakeDirectory:
                         handleMakeDirectory();
                         iterations = 0;
+                        break;
+                    case Action::ToggleHideEntries:
+                        handleToggleHideEntries();
                         break;
                     case Action::Quit:
                         handleQuit();

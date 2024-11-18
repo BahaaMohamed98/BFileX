@@ -16,6 +16,7 @@ enum class Action {
     TogglePreview,
     ToggleSortByTime,
     MakeDirectory,
+    ToggleHideEntries,
     Quit,
 };
 
@@ -34,6 +35,7 @@ class InputHandler {
         {'p', Action::TogglePreview},
         {'t', Action::ToggleSortByTime},
         {'m', Action::MakeDirectory},
+        {'H', Action::ToggleHideEntries},
         {'q', Action::Quit}, {keyCode::Esc, Action::Quit},
     };
 
@@ -48,6 +50,7 @@ class InputHandler {
     void handleTogglePreview() const;
     void handleSortByTime() const;
     void handleMakeDirectory() const;
+    void handleToggleHideEntries() const;
     void handleQuit() const;
 
     [[nodiscard]] static Action getAction(const char& input);

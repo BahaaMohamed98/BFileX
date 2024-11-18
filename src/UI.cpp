@@ -7,8 +7,8 @@
 UI::UI() {
     Terminal::enableAlternateScreen(); // uses the alternate screen buffer
     Terminal::setTitle("BFileX");
-    Terminal::clearScreen();
     Terminal::hideCursor();
+    Terminal::clearScreen();
 
     // setting the terminal dimensions
     auto [nWidth, nHeight] = Terminal::size();
