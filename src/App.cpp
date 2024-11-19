@@ -10,9 +10,8 @@ App::App()
 }
 
 App& App::getInstance() {
-    if (instance == nullptr)
-        instance = new App();
-    return *instance;
+    static App app;
+    return app;
 }
 
 [[nodiscard]] bool App::isRunning() const {
@@ -161,5 +160,3 @@ void App::setShowPreview(const bool& showPreview) {
 bool App::shouldShowPreview() const {
     return showPreview.load();
 }
-
-App* App::instance = nullptr;

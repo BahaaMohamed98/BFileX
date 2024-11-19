@@ -23,7 +23,6 @@ enum class Action {
 };
 
 class InputHandler {
-    static InputHandler* instance;
     App& app;
     Terminal terminal;
 

@@ -237,9 +237,8 @@ bool InputHandler::readInputString(const std::string& prompt, std::string& input
 }
 
 InputHandler& InputHandler::getInstance() {
-    if (instance == nullptr)
-        instance = new InputHandler();
-    return *instance;
+    static InputHandler inputHandler;
+    return inputHandler;
 }
 
 void InputHandler::handleInput() {
@@ -305,5 +304,3 @@ void InputHandler::handleInput() {
         }
     );
 }
-
-InputHandler* InputHandler::instance = nullptr;

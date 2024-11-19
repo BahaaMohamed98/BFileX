@@ -27,8 +27,6 @@ class App {
 
     fs::path previousParent;
 
-    static App* instance;
-
     App();
 
 public:

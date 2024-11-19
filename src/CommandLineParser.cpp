@@ -9,16 +9,19 @@ void CommandLineParser::printHelp() {
     constexpr int width = 10;
 
     printer.setTextColor(Color::Blue).println("\nBFileX")
-            .resetColors().println(std::setw(width), "A simple terminal-based file explorer\n");
+           .resetColors().println(std::setw(width), "A simple terminal-based file explorer\n");
 
     printer.setTextColor(Color::Yellow).print("USAGE:\n", std::setw(width)).resetColors();
     printUsage();
 
     printer.setTextColor(Color::Yellow).println("OPTIONS:");
 
-    auto printCommand = [&](const std::string& command, const std::string& description) {
+    auto printCommand = [&](const std::string& command, const std::string& description, const bool newLine = true) {
         printer.setTextColor(Color::Cyan).println(std::setw(width), command)
-                .resetColors().println(std::setw(width + 7), description, "\n");
+               .resetColors().println(std::setw(width + 7), description);
+
+        if (newLine)
+            printer.println();
     };
 
     printCommand("-t, --time", "Sort entries by time");
@@ -26,7 +29,7 @@ void CommandLineParser::printHelp() {
     printCommand("-r, --reverse", "Reverse entries");
     printCommand("-a, --all", "Show all entries");
     printCommand("-np, --no-preview", "Don't show file preview");
-    printCommand("-h, --help", "Show help screen");
+    printCommand("-h, --help", "Show help screen", false);
 }
 
 Action CommandLineParser::getAction(const std::string& command) {
@@ -41,20 +44,12 @@ void CommandLineParser::parse(const int argc, char** argv) {
     if (argc == 1)
         return;
 
-    std::stringstream commands;
-    // reading the commands into a string stream
-    // starting at index 1 to get rid of the program name
-    for (int i = 1; i < argc; ++i) {
-        commands << argv[i] << ' ';
-    }
-
     App& app = App::getInstance();
-    std::string command;
+
+    // starting at index 1 to get rid of the program name
 
     for (int i = 1; i < argc; ++i) {
-        // getting the next command
-        commands >> command;
-
+        const auto command = argv[i];
         switch (getAction(command)) {
             case Action::ToggleSortByTime:
                 app.setSortType(SortType::Time);
@@ -77,7 +72,7 @@ void CommandLineParser::parse(const int argc, char** argv) {
             default:
                 Printer(Color::Red).print("Error: ");
                 Printer().print("Unknown command: \"")
-                          .setTextColor(Color::Cyan).print(command).resetColors().println("\"\n");
+                         .setTextColor(Color::Cyan).print(command).resetColors().println("\"\n");
 
                 Printer().print("For for more information try ").setTextColor(Color::Cyan).println("--help");
                 exit(1);
