@@ -37,6 +37,7 @@ class InputHandler {
         {'d', Action::Delete},
         {'t', Action::ToggleSortByTime},
         {'s', Action::ToggleSortBySize},
+        {'R', Action::ToggleReverseEntries},
         {'H', Action::ToggleHideEntries},
         {'p', Action::TogglePreview},
         {'q', Action::Quit},
@@ -53,6 +54,7 @@ class InputHandler {
     void handleDelete() const;
     void handleToggleSortByTime() const;
     void handleToggleSortBySize() const;
+    void handleToggleReverseEntries() const;
     void handleToggleHideEntries() const;
     void handleTogglePreview() const;
     void handleQuit() const;

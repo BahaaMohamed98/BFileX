@@ -11,6 +11,28 @@ bool FileManager::lexicographicalCompare(const std::string& first, const std::st
     );
 }
 
+void FileManager::setEntries(
+    const fs::path& rootPath,
+    std::vector<fs::directory_entry>& entries,
+    const bool& showHidden,
+    const SortType& sortType,
+    const bool& reverse
+) {
+    entries.clear(); // clear previous entries
+
+    entries.emplace_back(".."); // add the previous directory `..`
+
+    for (const auto& item : fs::directory_iterator(rootPath)) {
+        // if hidden files are allowed or file is not hidden add to the entries
+        if (showHidden or !FileProperties::isHidden(item))
+            entries.push_back(item);
+    }
+
+    // sort the entries according to the sort type
+    if (sortType != SortType::None)
+        sortEntries(entries, sortType, showHidden, reverse);
+}
+
 void FileManager::sortEntries(
     std::vector<fs::directory_entry>& entries,
     const SortType& sortType,
@@ -89,28 +111,6 @@ void FileManager::openFile(const std::string& filePath) {
     command = "open";
 #endif
     std::system((command + " \'" + filePath + "\'").c_str());
-}
-
-void FileManager::setEntries(
-    const fs::path& rootPath,
-    std::vector<fs::directory_entry>& entries,
-    const bool& showHidden,
-    const SortType& sortType,
-    const bool& reverse
-) {
-    entries.clear(); // clear previous entries
-
-    entries.emplace_back(".."); // add the previous directory `..`
-
-    for (const auto& item : fs::directory_iterator(rootPath)) {
-        // if hidden files are allowed or file is not hidden add to the entries
-        if (showHidden or !FileProperties::isHidden(item))
-            entries.push_back(item);
-    }
-
-    // sort the entries according to the sort type
-    if (sortType != SortType::None)
-        sortEntries(entries, sortType, showHidden, reverse);
 }
 
 // returns the index of a path in a given vector of entries

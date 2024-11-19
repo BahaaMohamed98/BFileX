@@ -143,6 +143,10 @@ void InputHandler::handleToggleSortBySize() const {
     }
 }
 
+void InputHandler::handleToggleReverseEntries() const {
+    app.setReverseEntries(!app.shouldReverseEntries());
+}
+
 void InputHandler::handleMakeDirectory() const {
     std::string inputBuffer;
 
@@ -154,7 +158,10 @@ void InputHandler::handleMakeDirectory() const {
         app.setCustomFooter([=] {
             Terminal(Color::Green).setStyle(Style::Bold).print("Created directory: ", inputBuffer);
         });
+
         app.updateEntries();
+        // place cursor on the newly created directory
+        app.setEntryIndex(FileManager::getIndex(fs::current_path() / fs::path(inputBuffer), app.getEntries()));
     } else {
         app.setCustomFooter([] {
             Terminal(Color::Red).setStyle(Style::Bold).print("Failed to create directory!");
@@ -271,6 +278,9 @@ void InputHandler::handleInput() {
                         break;
                     case Action::ToggleSortBySize:
                         handleToggleSortBySize();
+                        break;
+                    case Action::ToggleReverseEntries:
+                        handleToggleReverseEntries();
                         break;
                     case Action::ToggleHideEntries:
                         handleToggleHideEntries();

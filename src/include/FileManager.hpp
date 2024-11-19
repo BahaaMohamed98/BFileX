@@ -22,15 +22,6 @@ class FileManager {
     static bool lexicographicalCompare(const std::string& first, const std::string& second);
 
 public:
-    static void sortEntries(
-        std::vector<fs::directory_entry>& entries,
-        const SortType& sortType,
-        const bool& showHidden,
-        const bool& reverse
-    );
-
-    static void openFile(const std::string& filePath);
-
     static void setEntries(
         const fs::path& rootPath,
         std::vector<fs::directory_entry>& entries,
@@ -39,5 +30,13 @@ public:
         const bool& reverse
     );
 
+    static void sortEntries(
+        std::vector<fs::directory_entry>& entries,
+        const SortType& sortType,
+        const bool& showHidden,
+        const bool& reverse
+    );
+
+    static void openFile(const std::string& filePath);
     static int getIndex(const fs::path& target, const std::vector<fs::directory_entry>& entries);
 };
