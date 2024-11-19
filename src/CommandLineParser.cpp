@@ -1,23 +1,23 @@
 #include "CommandLineParser.hpp"
 
 void CommandLineParser::printUsage() {
-    Terminal().println("BFileX [OPTIONS]\n");
+    Printer().println("BFileX [OPTIONS]\n");
 }
 
 void CommandLineParser::printHelp() {
-    Terminal terminal;
+    Printer printer;
     constexpr int width = 10;
 
-    terminal.setTextColor(Color::Blue).println("\nBFileX")
+    printer.setTextColor(Color::Blue).println("\nBFileX")
             .resetColors().println(std::setw(width), "A simple terminal-based file explorer\n");
 
-    terminal.setTextColor(Color::Yellow).print("USAGE:\n", std::setw(width)).resetColors();
+    printer.setTextColor(Color::Yellow).print("USAGE:\n", std::setw(width)).resetColors();
     printUsage();
 
-    terminal.setTextColor(Color::Yellow).println("OPTIONS:");
+    printer.setTextColor(Color::Yellow).println("OPTIONS:");
 
     auto printCommand = [&](const std::string& command, const std::string& description) {
-        terminal.setTextColor(Color::Cyan).println(std::setw(width), command)
+        printer.setTextColor(Color::Cyan).println(std::setw(width), command)
                 .resetColors().println(std::setw(width + 7), description, "\n");
     };
 
@@ -75,11 +75,11 @@ void CommandLineParser::parse(const int argc, char** argv) {
                 printHelp();
                 exit(0);
             default:
-                Terminal(Color::Red).print("Error: ");
-                Terminal().print("Unknown command: \"")
+                Printer(Color::Red).print("Error: ");
+                Printer().print("Unknown command: \"")
                           .setTextColor(Color::Cyan).print(command).resetColors().println("\"\n");
 
-                Terminal().print("For for more information try ").setTextColor(Color::Cyan).println("--help");
+                Printer().print("For for more information try ").setTextColor(Color::Cyan).println("--help");
                 exit(1);
         }
     }

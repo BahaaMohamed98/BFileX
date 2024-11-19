@@ -8,8 +8,8 @@ BFileX::BFileX()
     : app(App::getInstance()), inputHandler(InputHandler::getInstance()) {}
 
 void BFileX::signalHandler(int signal) {
-    Terminal::showCursor();
-    Terminal::disableAlternateScreen();
+    Cursor::show();
+    Screen::disableAlternateScreen();
     exit(0);
 }
 
@@ -22,7 +22,7 @@ bool BFileX::terminalResized() {
 }
 
 void BFileX::renderApp() {
-    Terminal::clearScreen();
+    Screen::clear();
 
     ui.renderTopBar((fs::current_path() / app.getCurrentEntry()).string());
     ui.renderEntries(app.getEntries(), app.getEntryIndex());
@@ -35,7 +35,7 @@ void BFileX::renderApp() {
     )
         ui.renderPreview(FileProperties::getName(app.getCurrentEntry()).string());
 
-    Terminal::flush();
+    Printer::flush();
 }
 
 void BFileX::run() {

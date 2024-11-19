@@ -29,11 +29,11 @@ FileProperties::Icon FileProperties::getIcon(const fs::directory_entry& entry) {
     return iconMap[determineEntryType(entry)];
 }
 
-Color FileProperties::getColor(const fs::directory_entry& entry) {
+Color::Code FileProperties::getColor(const fs::directory_entry& entry) {
     return colorMap[determineEntryType(entry)];
 }
 
-Color FileProperties::getColor(const EntryType& entryType) {
+Color::Code FileProperties::getColor(const EntryType& entryType) {
     return colorMap[entryType];
 }
 

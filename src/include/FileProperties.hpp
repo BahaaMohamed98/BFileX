@@ -36,7 +36,7 @@ public:
     };
 
 private:
-    static inline std::unordered_map<EntryType, Color> colorMap{
+    static inline std::unordered_map<EntryType, Color::Code> colorMap{
         {EntryType::Directory, Color::Blue},
         {EntryType::Executable, Color::Red},
         {EntryType::Symlink, Color::Cyan},
@@ -87,8 +87,8 @@ public:
     static EntryType determineEntryType(const fs::directory_entry& entry);
     static FileType determineFileType(const fs::path& filePath);
     static Icon getIcon(const fs::directory_entry& entry);
-    static Color getColor(const fs::directory_entry& entry);
-    static Color getColor(const EntryType& entryType);
+    static Color::Code getColor(const fs::directory_entry& entry);
+    static Color::Code getColor(const EntryType& entryType);
     static bool isHidden(const std::filesystem::directory_entry& entry);
     static bool isExecutable(const std::filesystem::path& path);
     static bool isBinary(const std::string& path);

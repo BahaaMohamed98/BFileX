@@ -23,17 +23,17 @@ void Preview::readFile(const std::string& path) {
 }
 
 void Preview::printBorderLine(const std::string& leftCorner, const std::string& rightCorner, const int& length) const {
-    Terminal terminal;
+    Printer printer;
 
     // left corner
-    terminal.print(leftCorner);
+    printer.print(leftCorner);
 
     // horizontal line
     for (int i = 0; i < length; ++i)
-        terminal.print(horizontalLine);
+        printer.print(horizontalLine);
 
     // right corner
-    terminal.println(rightCorner);
+    printer.println(rightCorner);
 }
 
 Preview::Preview() {
@@ -55,31 +55,31 @@ void Preview::render(const std::string& filePath) {
     // read file's content
     readFile(filePath);
 
-    Terminal terminal;
+    Printer printer;
     // move to starting position of the preview
-    Terminal::moveTo(leftStartingPosition, topStartingPosition);
+    Cursor::moveTo(leftStartingPosition, topStartingPosition);
 
     // top border
     printBorderLine(topLeftCorner, topRightCorner, contentLength);
 
     // vertical borders and content
     for (int i = 0; i < maxLines; ++i) {
-        Terminal::moveTo(leftStartingPosition, topStartingPosition + i + 1);
+        Cursor::moveTo(leftStartingPosition, topStartingPosition + i + 1);
 
         // left vertical line
-        terminal.print(verticalLine);
+        printer.print(verticalLine);
 
         // file content
         if (i < lines.size())
-            terminal.print(" ", lines[i]);
+            printer.print(" ", lines[i]);
 
         // right vertical line
-        Terminal::moveTo(tWidth, topStartingPosition + i + 1);
-        terminal.print(verticalLine);
+        Cursor::moveTo(tWidth, topStartingPosition + i + 1);
+        printer.print(verticalLine);
     }
 
     // move to bottom border location
-    Terminal::moveTo(leftStartingPosition, tHeight - 1);
+    Cursor::moveTo(leftStartingPosition, tHeight - 1);
 
     // bottom border
     printBorderLine(bottomLeftCorner, BottomRightCorner, contentLength);

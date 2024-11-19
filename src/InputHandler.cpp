@@ -65,13 +65,13 @@ void InputHandler::handleRename() const {
         app.setEntryIndex(FileManager::getIndex(newPath, app.getEntries()));
 
         app.setCustomFooter([=] {
-            Terminal(Color::Green)
-                    .setStyle(Style::Bold)
+            Printer(Color::Green)
+                    .setTextStyle(TextStyle::Bold)
                     .print("Renamed ", FileProperties::getName(oldEntry), " to: ", newPath.filename());
         });
     } catch (...) {
         app.setCustomFooter([] {
-            Terminal(Color::Red).setStyle(Style::Bold).print("Failed to rename entry!");
+            Printer(Color::Red).setTextStyle(TextStyle::Bold).print("Failed to rename entry!");
         });
     }
 }
@@ -99,18 +99,18 @@ void InputHandler::handleDelete() const {
             const auto deletedEntriess = fs::remove_all(app.getCurrentEntry().path());
 
             app.setCustomFooter([=] {
-                Terminal term(Color::Green);
+                Printer printer(Color::Green);
 
-                term.setStyle(Style::Bold)
-                    .print("Deleted entry: ", targetEntry);
+                printer.setTextStyle(TextStyle::Bold)
+                       .print("Deleted entry: ", targetEntry);
 
                 if (deletedEntriess > 1)
-                    term.print(" and ", deletedEntriess - 1, " other ", (deletedEntriess > 2 ? "entries" : "entry"));
+                    printer.print(" and ", deletedEntriess - 1, " other ", (deletedEntriess > 2 ? "entries" : "entry"));
             });
         } else {
             fs::remove(app.getCurrentEntry().path());
             app.setCustomFooter([=] {
-                Terminal(Color::Green).setStyle(Style::Bold).print("Deleted entry: ", targetEntry);
+                Printer(Color::Green).setTextStyle(TextStyle::Bold).print("Deleted entry: ", targetEntry);
             });
         }
 
@@ -118,7 +118,7 @@ void InputHandler::handleDelete() const {
         app.updateEntries();
     } catch (...) {
         app.setCustomFooter([] {
-            Terminal(Color::Red).setStyle(Style::Bold).print("Failed to delete entry!");
+            Printer(Color::Red).setTextStyle(TextStyle::Bold).print("Failed to delete entry!");
         });
     }
 }
@@ -156,7 +156,7 @@ void InputHandler::handleMakeDirectory() const {
 
     if (fs::create_directory(fs::path(inputBuffer))) {
         app.setCustomFooter([=] {
-            Terminal(Color::Green).setStyle(Style::Bold).print("Created directory: ", inputBuffer);
+            Printer(Color::Green).setTextStyle(TextStyle::Bold).print("Created directory: ", inputBuffer);
         });
 
         app.updateEntries();
@@ -164,7 +164,7 @@ void InputHandler::handleMakeDirectory() const {
         app.setEntryIndex(FileManager::getIndex(fs::current_path() / fs::path(inputBuffer), app.getEntries()));
     } else {
         app.setCustomFooter([] {
-            Terminal(Color::Red).setStyle(Style::Bold).print("Failed to create directory!");
+            Printer(Color::Red).setTextStyle(TextStyle::Bold).print("Failed to create directory!");
         });
     }
 }
@@ -184,15 +184,15 @@ void InputHandler::handleQuit() const {
     return Action::None;
 }
 
-bool InputHandler::confirmAction(const std::string& prompt, const Color& color) const {
-    Terminal::showCursor();
+bool InputHandler::confirmAction(const std::string& prompt, const Color::Code& color) const {
+    Cursor::show();
 
     app.setCustomFooter([&] {
-        Terminal(color).setStyle(Style::Bold).print(prompt);
+        Printer(color).setTextStyle(TextStyle::Bold).print(prompt);
     });
 
-    const char answer = Terminal::getChar();
-    Terminal::hideCursor();
+    const char answer = Input::getChar();
+    Cursor::hide();
 
     // return if the answer is not yes
     return answer == 'y' or answer == 'Y';
@@ -202,16 +202,16 @@ bool InputHandler::confirmAction(const std::string& prompt, const Color& color) 
 // return true on success false if user cancelled
 bool InputHandler::readInputString(const std::string& prompt, std::string& inputBuffer,
                                    const EntryType entryType) const {
-    Terminal::showCursor();
+    Cursor::show();
 
     app.setCustomFooter([&] {
-        Terminal(FileProperties::getColor(entryType))
+        Printer(FileProperties::getColor(entryType))
                 .print(prompt, inputBuffer);
     });
 
     bool isTakingInput = true;
     while (isTakingInput) {
-        switch (const char c = Terminal::getChar()) {
+        switch (const char c = Input::getChar()) {
             case keyCode::Enter:
                 isTakingInput = false;
                 break;
@@ -220,7 +220,7 @@ bool InputHandler::readInputString(const std::string& prompt, std::string& input
                 app.updateUI();
                 break;
             case keyCode::Esc: // cancel
-                Terminal::hideCursor();
+                Cursor::hide();
                 app.resetFooter();
                 return false;
             default:
@@ -232,7 +232,7 @@ bool InputHandler::readInputString(const std::string& prompt, std::string& input
         }
     }
 
-    Terminal::hideCursor();
+    Cursor::hide();
     return true;
 }
 
@@ -248,7 +248,7 @@ void InputHandler::handleInput() {
             int iterations = 0;
 
             while (app.isRunning()) {
-                switch (getAction(Terminal::getChar())) {
+                switch (getAction(Input::getChar())) {
                     case Action::Up:
                         handleUp();
                         break;

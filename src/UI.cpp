@@ -2,10 +2,10 @@
 #include "FileProperties.hpp"
 
 UI::UI() {
-    Terminal::enableAlternateScreen(); // uses the alternate screen buffer
+    Screen::enableAlternateScreen(); // uses the alternate screen buffer
     Terminal::setTitle("BFileX");
-    Terminal::hideCursor();
-    Terminal::clearScreen();
+    Cursor::hide();
+    Screen::clear();
 
     // setting the terminal dimensions
     auto [nWidth, nHeight] = Terminal::size();
@@ -13,20 +13,20 @@ UI::UI() {
 }
 
 UI::~UI() {
-    Terminal::showCursor();
-    Terminal::disableAlternateScreen();
+    Cursor::show();
+    Screen::disableAlternateScreen();
 }
 
 void UI::printEntry(const std::filesystem::directory_entry& entry, const bool& highlight) const {
-    Terminal terminal;
-    terminal.setStyle(Style::Bold);
+    Printer printer;
+    printer.setTextStyle(TextStyle::Bold);
 
-    const Color color = FileProperties::getColor(entry);
+    const Color::Code color = FileProperties::getColor(entry);
 
     if (highlight)
-        terminal.setTextColor(Color::Black).setBackgroundColor(color);
+        printer.setTextColor(Color::Black).setBackgroundColor(color);
     else
-        terminal.setTextColor(color);
+        printer.setTextColor(color);
 
     std::string entryStr = FileProperties::getIcon(entry).representation + FileProperties::getName(entry).string();
 
@@ -34,9 +34,9 @@ void UI::printEntry(const std::filesystem::directory_entry& entry, const bool& h
     if (static_cast<int>(entryStr.size()) >= selectionWidth)
         entryStr = entryStr.substr(0, selectionWidth - 5) + "~";
 
-    terminal.print(" ", entryStr, std::setw(selectionWidth - static_cast<int>(entryStr.size())), " ");
+    printer.print(" ", entryStr, std::setw(selectionWidth - static_cast<int>(entryStr.size())), " ");
 
-    Terminal(Color::Reset).println();
+    Printer().println();
 }
 
 void UI::renderTopBar(const std::string& currentPath) const {
@@ -46,13 +46,13 @@ void UI::renderTopBar(const std::string& currentPath) const {
     if (topBar.size() > tWidth)
         topBar = topBar.substr(0, tWidth - 1) + "~";
 
-    Terminal(Color::Blue)
-            .setStyle(Style::Bold).print(
+    Printer(Color::Blue)
+            .setTextStyle(TextStyle::Bold).print(
                 topBar.substr(0, std::min(lastSlashIndex + 1, topBar.size()))
             );
 
     if (lastSlashIndex < static_cast<int>(topBar.length()))
-        Terminal().println(topBar.substr(lastSlashIndex + 1));
+        Printer().println(topBar.substr(lastSlashIndex + 1));
 }
 
 void UI::renderEntries(const std::vector<fs::directory_entry>& entries, const size_t& currentIndex) {
@@ -81,28 +81,28 @@ void UI::renderEntries(const std::vector<fs::directory_entry>& entries, const si
 }
 
 void UI::renderFooter(App& app) const {
-    Terminal::moveTo(1, Terminal::size().height);
+    Cursor::moveTo(1, Terminal::size().height);
 
     if (app.getCustomFooter() != nullptr)
         return app.getCustomFooter()();
 
     const auto lastWriteTime = FileProperties::getLastWriteTime(app.getCurrentEntry().path());
 
-    Terminal().print(
+    Printer().print(
         app.getCurrentEntry().is_directory() ? "d" : ".",           // print file type
         FileProperties::permissionsToString(app.getCurrentEntry()), // print permissions
         "  ",
         std::put_time(std::localtime(&lastWriteTime), "%a %b %e %r %Y") // Print formatted time
     );
 
-    Terminal().print("  ", FileProperties::getSizeString(app.getCurrentEntry()));
+    Printer().print("  ", FileProperties::getSizeString(app.getCurrentEntry()));
 
     const std::string directoryNumber =
             " " + std::to_string(app.getEntryIndex() + 1) +
             "/" + std::to_string(static_cast<int>(app.getEntries().size()));
 
-    Terminal::moveTo(tWidth - static_cast<int>(directoryNumber.length()) + 1, tHeight);
-    Terminal().print(directoryNumber);
+    Cursor::moveTo(tWidth - static_cast<int>(directoryNumber.length()) + 1, tHeight);
+    Printer().print(directoryNumber);
 }
 
 void UI::renderPreview(const std::string& filePath) {
