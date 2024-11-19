@@ -93,6 +93,7 @@ public:
     static bool isExecutable(const std::filesystem::path& path);
     static bool isBinary(const std::string& path);
     static std::string permissionsToString(const fs::directory_entry& entry);
+    static std::string getSizeString(const fs::directory_entry& entry);
     static fs::path getName(const fs::directory_entry& entry);
     static std::time_t getLastWriteTime(const fs::path& path);
 };

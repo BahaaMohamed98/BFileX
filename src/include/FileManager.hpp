@@ -9,6 +9,7 @@ enum class SortType {
     None,
     Normal,
     Time,
+    Size,
 };
 
 class FileManager {
@@ -17,6 +18,8 @@ class FileManager {
             return !condition;
         return condition;
     }
+
+    static bool lexicographicalCompare(const std::string& first, const std::string& second);
 
 public:
     static void sortEntries(

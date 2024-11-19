@@ -1,5 +1,6 @@
 #include "FileProperties.hpp"
 #include <fstream>
+#include <cmath>
 
 FileProperties::Icon::Icon(std::string icon) : representation(std::move(icon)) {}
 FileProperties::Icon::Icon() : representation(iconMap[EntryType::Unknown].representation) {}
@@ -80,7 +81,7 @@ bool FileProperties::isBinary(const std::string& path) {
            std::any_of(
                std::istreambuf_iterator(file),
                std::istreambuf_iterator<char>(),
-               [](unsigned char c) {
+               [](const unsigned char c) {
                    return c < 0x20 && c != '\t' && c != '\n' && c != '\r';
                }
            );
@@ -121,6 +122,49 @@ std::time_t FileProperties::getLastWriteTime(const fs::path& path) {
     );
 
     return std::chrono::system_clock::to_time_t(time);
+}
+
+std::string FileProperties::getSizeString(const fs::directory_entry& entry) {
+    // return a fixed size string for directories (default on Linux)
+    if (entry.is_directory())
+        return "4 KB";
+
+    // suffixes for size units (B, KB, MB, etc.)
+    constexpr char suffixes[] = "BKMGTPE";
+
+    try {
+        // get the file size of the entry in bytes (may throw an exception)
+        auto fileSize = static_cast<double>(fs::file_size(entry.path()));
+
+        int power{}; // represents the exponent for 1024 (e.g., 1 for KB, 2 for MB, etc.).
+        // determine the appropriate size suffix and round the size down?
+        for (; fileSize >= 1024.0; ++power) {
+            fileSize /= 1024.0;
+        }
+
+        std::stringstream ss;
+        ss << std::fixed;
+
+        if (static_cast<int>(fileSize) == std::ceil(fileSize)) {
+            // don't print the decimal point if the size is an integer
+            ss << std::setprecision(0);
+        } else {
+            // format the size with a precision of 1 digit after the decimal point
+            ss << std::setprecision(1);
+        }
+
+        // adding the size with it's suffix
+        ss << fileSize << " " << suffixes[power];
+
+        // append 'B' if the size is larger than bytes
+        if (power > 0)
+            ss << "B";
+
+        return ss.str();
+    } catch (...) {
+        // return an empty string if an exception occurs
+        return "";
+    }
 }
 
 // Custom hash function for Icon

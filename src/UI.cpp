@@ -95,6 +95,8 @@ void UI::renderFooter(App& app) const {
         std::put_time(std::localtime(&lastWriteTime), "%a %b %e %r %Y") // Print formatted time
     );
 
+    Terminal().print("  ", FileProperties::getSizeString(app.getCurrentEntry()));
+
     const std::string directoryNumber =
             " " + std::to_string(app.getEntryIndex() + 1) +
             "/" + std::to_string(static_cast<int>(app.getEntries().size()));

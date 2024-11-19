@@ -14,8 +14,11 @@ enum class Action {
     Delete,
     TogglePreview,
     ToggleSortByTime,
+    ToggleSortBySize,
+    ToggleReverseEntries,
     MakeDirectory,
     ToggleHideEntries,
+    ToggleHelp,
     Quit,
 };
 
@@ -29,12 +32,13 @@ class InputHandler {
         {'j', Action::Down}, {keyCode::ArrowDown, Action::Down}, {keyCode::Tab, Action::Down},
         {'l', Action::Enter}, {keyCode::ArrowRight, Action::Enter}, {keyCode::Enter, Action::Enter},
         {'h', Action::Back}, {keyCode::ArrowLeft, Action::Back},
+        {'m', Action::MakeDirectory},
         {'r', Action::Rename},
         {'d', Action::Delete},
-        {'p', Action::TogglePreview},
         {'t', Action::ToggleSortByTime},
-        {'m', Action::MakeDirectory},
+        {'s', Action::ToggleSortBySize},
         {'H', Action::ToggleHideEntries},
+        {'p', Action::TogglePreview},
         {'q', Action::Quit},
     };
 
@@ -44,12 +48,13 @@ class InputHandler {
     void handleDown() const;
     void handleEnter() const;
     void handleBack() const;
+    void handleMakeDirectory() const;
     void handleRename() const;
     void handleDelete() const;
-    void handleTogglePreview() const;
-    void handleSortByTime() const;
-    void handleMakeDirectory() const;
+    void handleToggleSortByTime() const;
+    void handleToggleSortBySize() const;
     void handleToggleHideEntries() const;
+    void handleTogglePreview() const;
     void handleQuit() const;
 
     [[nodiscard]] static Action getAction(const char& input);

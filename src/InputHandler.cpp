@@ -127,9 +127,17 @@ void InputHandler::handleTogglePreview() const {
     app.setShowPreview(!app.shouldShowPreview());
 }
 
-void InputHandler::handleSortByTime() const {
+void InputHandler::handleToggleSortByTime() const {
     if (app.getSortType() != SortType::Time) {
         app.setSortType(SortType::Time);
+    } else {
+        app.setSortType(SortType::Normal);
+    }
+}
+
+void InputHandler::handleToggleSortBySize() const {
+    if (app.getSortType() != SortType::Size) {
+        app.setSortType(SortType::Size);
     } else {
         app.setSortType(SortType::Normal);
     }
@@ -155,7 +163,7 @@ void InputHandler::handleMakeDirectory() const {
 }
 
 void InputHandler::handleToggleHideEntries() const {
-    app.setHiddenEntries(!app.shouldShowHiddenEntries());
+    app.setShowHiddenEntries(!app.shouldShowHiddenEntries());
     app.updateEntries();
 }
 
@@ -254,18 +262,21 @@ void InputHandler::handleInput() {
                         handleDelete();
                         iterations = 0;
                         break;
-                    case Action::TogglePreview:
-                        handleTogglePreview();
-                        break;
-                    case Action::ToggleSortByTime:
-                        handleSortByTime();
-                        break;
                     case Action::MakeDirectory:
                         handleMakeDirectory();
                         iterations = 0;
                         break;
+                    case Action::ToggleSortByTime:
+                        handleToggleSortByTime();
+                        break;
+                    case Action::ToggleSortBySize:
+                        handleToggleSortBySize();
+                        break;
                     case Action::ToggleHideEntries:
                         handleToggleHideEntries();
+                        break;
+                    case Action::TogglePreview:
+                        handleTogglePreview();
                         break;
                     case Action::Quit:
                         handleQuit();

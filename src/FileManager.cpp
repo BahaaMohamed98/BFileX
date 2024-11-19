@@ -1,6 +1,16 @@
 #include "FileManager.hpp"
 #include "FileProperties.hpp"
 
+bool FileManager::lexicographicalCompare(const std::string& first, const std::string& second) {
+    return std::lexicographical_compare(
+        first.begin(), first.end(),
+        second.begin(), second.end(),
+        [](const char a, const char b) {
+            return tolower(a) < tolower(b);
+        }
+    );
+}
+
 void FileManager::sortEntries(
     std::vector<fs::directory_entry>& entries,
     const SortType& sortType,
@@ -17,34 +27,54 @@ void FileManager::sortEntries(
                 return false;
 
             if (sortType == SortType::Normal) {
+                // rank hidden files higher if shown
                 if (showHidden) {
-                    const bool firstHidden = FileProperties::isHidden(first);
-                    const bool secondHidden = FileProperties::isHidden(second);
+                    const bool firstIsHidden = FileProperties::isHidden(first);
+                    const bool secondIsHidden = FileProperties::isHidden(second);
 
-                    if (firstHidden != secondHidden)
-                        return applyReverse(firstHidden, reverse);
+                    if (firstIsHidden != secondIsHidden)
+                        return applyReverse(firstIsHidden, reverse);
                 }
 
+                // rank directories higher
                 const bool firstIsDir = first.is_directory();
                 const bool secondIsDir = second.is_directory();
+
                 if (firstIsDir != secondIsDir)
                     return applyReverse(firstIsDir, reverse);
 
-                const std::string a = first.path().string(), b = second.path().string();
-                return std::lexicographical_compare(
-                    a.begin(), a.end(),
-                    b.begin(), b.end(),
-                    [&reverse](const char& A, const char& B) {
-                        return applyReverse(tolower(A) < tolower(B), reverse);
-                    }
-                );
+                // rank based on the lexicogrphical file name comaparision
+                return applyReverse(lexicographicalCompare(first.path().string(), second.path().string()), reverse);
             } else if (sortType == SortType::Time) {
+                // rank latest modified higher
                 return applyReverse(
                     fs::last_write_time(first.path()) > fs::last_write_time(second.path()),
                     reverse
                 );
+            } else if (sortType == SortType::Size) {
+                constexpr int directorySize = 4 * 1024; // used as a default size for directories
+                try {
+                    const bool firstIsRegularFile = first.is_regular_file();
+                    const bool secondIsRegularFile = second.is_regular_file();
+
+                    // compare regurlar files' sizes directly
+                    if (firstIsRegularFile and secondIsRegularFile) {
+                        return applyReverse(fs::file_size(first.path()) > fs::file_size(second.path()), reverse);
+                    } // use `directorySize` as a size for all directories
+                    else if (firstIsRegularFile and second.is_directory()) {
+                        return applyReverse(fs::file_size(first.path()) > directorySize, reverse);
+                    } else if (first.is_directory() and secondIsRegularFile) {
+                        return applyReverse(directorySize > fs::file_size(second.path()), reverse);
+                    } else { // if they have the same size or are both directories sort lexicographically
+                        return applyReverse(
+                            lexicographicalCompare(first.path().string(), second.path().string()),
+                            reverse
+                        );
+                    }
+                } catch (...) {}
+                return applyReverse(first.is_regular_file(), reverse);
             } else {
-                return first < second;
+                return lexicographicalCompare(first.path().string(), second.path().string());
             }
         });
 }
@@ -52,7 +82,7 @@ void FileManager::sortEntries(
 void FileManager::openFile(const std::string& filePath) {
     std::string command;
 #ifdef _WIN32
-    command = "start";
+    command = "start \"\"";
 #elif __linux__
     command = "xdg-open";
 #elif __APPLE__

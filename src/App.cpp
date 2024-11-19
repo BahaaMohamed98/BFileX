@@ -76,7 +76,7 @@ std::vector<fs::directory_entry>& App::getEntries() {
     return entries;
 }
 
-void App::setHiddenEntries(const bool& showHiddenFiles) {
+void App::setShowHiddenEntries(const bool& showHiddenFiles) {
     this->showHiddenEntries = showHiddenFiles;
 }
 

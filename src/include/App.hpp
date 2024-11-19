@@ -49,7 +49,7 @@ public:
     void updateEntries();
     void sortEntries();
 
-    void setHiddenEntries(const bool& showHiddenFiles);
+    void setShowHiddenEntries(const bool& showHiddenFiles);
     [[nodiscard]] bool shouldShowHiddenEntries() const;
 
     void setReverseEntries(const bool& reverseEntries);
