@@ -89,7 +89,6 @@ Explore how BFileX looks and works in different scenarios:
   </div>
 </details>
 
-
 ## 🚀 Installation
 
 ### Prerequisites
@@ -152,6 +151,7 @@ cmake --build .
 | <kbd>d</kbd>                                          | Delete current entry          |
 | <kbd>t</kbd>                                          | Toggle sorting by time        |
 | <kbd>s</kbd>                                          | Toggle sorting by size        |
+| <kbd>R</kbd>                                          | Toggle reversing entries      |
 | <kbd>H</kbd>                                          | Toggle showing hidden entries |
 | <kbd>p</kbd>                                          | Toggle preview                |
 | <kbd>q</kbd>                                          | Quit                          |
