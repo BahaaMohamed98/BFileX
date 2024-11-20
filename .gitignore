@@ -4,6 +4,5 @@ cmake-build-debug
 build/test
 build/Build
 build/tmp
-src/Build.cpp
-src/test.cpp
 countLines.zsh
+Bfilex-todo.txt

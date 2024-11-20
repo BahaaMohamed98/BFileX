@@ -6,19 +6,19 @@ void Preview::readFile(const std::string& path) {
 
     std::ifstream file(path);
     if (!file.is_open()) {
-        // on failure write failed to open in the preview
+        // display an error message on failure
         lines.emplace_back(("Failed to open file: " + path).substr(0, maxLineWidth));
         return;
     }
 
     std::string line;
-    // read maxLines number of lines or less
+    // read upto `maxLines` from the file
     for (int i = 0; getline(file, line) and i < maxLines; ++i) {
-        // trimming the part more than maxLineWidth
+        // trimming line if it exceeds `maxLineWidth`
         if (line.size() > maxLineWidth)
             line = line.substr(0, maxLineWidth);
 
-        lines.emplace_back(line);
+        lines.emplace_back(line); // store the extracted line
     }
 }
 
@@ -42,17 +42,21 @@ Preview::Preview() {
 }
 
 void Preview::resize(const int& width, const int& height) { // todo: change to a simpler way
-    tWidth = width, tHeight = height;
-    leftStartingPosition = tWidth / 2;
+    terminalWidth = width, terminalHeight = height;
+
+    // calculate starting position for the preview box
+    leftStartingPosition = terminalWidth / 2;
     topStartingPosition = 2;
-    maxLines = tHeight - 4;
-    maxLineWidth = (tWidth - leftStartingPosition) - 3;
+
+    // determine the maximum number of lines and width of each line
+    maxLines = terminalHeight - 4;
+    maxLineWidth = (terminalWidth - leftStartingPosition) - 3;
 }
 
 void Preview::render(const std::string& filePath) {
-    const int contentLength = tWidth - leftStartingPosition - 1;
+    const int contentLength = terminalWidth - leftStartingPosition - 1;
 
-    // read file's content
+    // read the file content into the `lines` vector
     readFile(filePath);
 
     Printer printer;
@@ -74,12 +78,12 @@ void Preview::render(const std::string& filePath) {
             printer.print(" ", lines[i]);
 
         // right vertical line
-        Cursor::moveTo(tWidth, topStartingPosition + i + 1);
+        Cursor::moveTo(terminalWidth, topStartingPosition + i + 1);
         printer.print(verticalLine);
     }
 
     // move to bottom border location
-    Cursor::moveTo(leftStartingPosition, tHeight - 1);
+    Cursor::moveTo(leftStartingPosition, terminalHeight - 1);
 
     // bottom border
     printBorderLine(bottomLeftCorner, BottomRightCorner, contentLength);

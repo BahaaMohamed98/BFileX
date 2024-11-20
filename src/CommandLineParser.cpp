@@ -47,10 +47,8 @@ void CommandLineParser::parse(const int argc, char** argv) {
     App& app = App::getInstance();
 
     // starting at index 1 to get rid of the program name
-
     for (int i = 1; i < argc; ++i) {
-        const auto command = argv[i];
-        switch (getAction(command)) {
+        switch (const std::string command{argv[i]}; getAction(command)) {
             case Action::ToggleSortByTime:
                 app.setSortType(SortType::Time);
                 break;

@@ -24,9 +24,10 @@ FileType FileProperties::determineFileType(const fs::path& filePath) {
 }
 
 FileProperties::Icon FileProperties::getIcon(const fs::directory_entry& entry) {
-    if (determineEntryType(entry) == EntryType::RegularFile)
+    const EntryType entryType = determineEntryType(entry);
+    if (entryType == EntryType::RegularFile)
         return extensionIconMap[determineFileType(entry.path())];
-    return iconMap[determineEntryType(entry)];
+    return iconMap[entryType];
 }
 
 Color::Code FileProperties::getColor(const fs::directory_entry& entry) {
@@ -77,37 +78,52 @@ bool FileProperties::isExecutable(const std::filesystem::path& path) {
 
 bool FileProperties::isBinary(const std::string& path) {
     std::ifstream file(path, std::ios::binary);
-    return file.is_open() &&
-           std::any_of(
-               std::istreambuf_iterator(file),
-               std::istreambuf_iterator<char>(),
-               [](const unsigned char c) {
-                   return c < 0x20 && c != '\t' && c != '\n' && c != '\r';
-               }
-           );
+
+    if (!file.is_open()) {
+        return false;
+    }
+
+    // limiting the checking to the first 4 KB
+    constexpr size_t bufferSize = 4096;
+    char buffer[bufferSize];
+
+    // read the first 4kb into the file
+    file.read(buffer, bufferSize);
+
+    // checking if any of ther chracter read is not normal?
+    return std::any_of(
+        buffer, buffer + file.gcount(),
+        [](const unsigned char c) {
+            return c < 0x20 && c != '\t' && c != '\n' && c != '\r';
+        }
+    );
 }
 
 std::string FileProperties::permissionsToString(const fs::directory_entry& entry) {
-    std::string ret;
+    try {
+        std::string ret;
+        const auto permissions = fs::status(entry.path()).permissions();
 
-    const auto permissions = fs::status(entry.path()).permissions();
-    auto appendPermission = [&](const std::string& ch, const fs::perms& permission) {
-        ret.append(
-            (permissions & permission) == fs::perms::none ? "-" : ch
-        );
-    };
+        auto appendPermission = [&](const std::string& ch, const fs::perms& permission) {
+            ret.append(
+                (permissions & permission) == fs::perms::none ? "-" : ch
+            );
+        };
 
-    appendPermission("r", fs::perms::owner_read);
-    appendPermission("w", fs::perms::owner_write);
-    appendPermission("x", fs::perms::owner_exec);
-    appendPermission("r", fs::perms::group_read);
-    appendPermission("w", fs::perms::group_write);
-    appendPermission("x", fs::perms::group_exec);
-    appendPermission("r", fs::perms::others_read);
-    appendPermission("w", fs::perms::others_write);
-    appendPermission("x", fs::perms::others_exec);
+        appendPermission("r", fs::perms::owner_read);
+        appendPermission("w", fs::perms::owner_write);
+        appendPermission("x", fs::perms::owner_exec);
+        appendPermission("r", fs::perms::group_read);
+        appendPermission("w", fs::perms::group_write);
+        appendPermission("x", fs::perms::group_exec);
+        appendPermission("r", fs::perms::others_read);
+        appendPermission("w", fs::perms::others_write);
+        appendPermission("x", fs::perms::others_exec);
 
-    return ret;
+        return ret;
+    } catch (...) {
+        return ""; // return an empty string if an exception is raised (due to an api error)
+    }
 }
 
 fs::path FileProperties::getName(const fs::directory_entry& entry) {
@@ -115,22 +131,23 @@ fs::path FileProperties::getName(const fs::directory_entry& entry) {
 }
 
 std::time_t FileProperties::getLastWriteTime(const fs::path& path) {
-    // last write time calculation
-    auto lastWrite = fs::last_write_time(path);
-    const auto time = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
-        lastWrite - decltype(lastWrite)::clock::now() + std::chrono::system_clock::now()
-    );
+    try {
+        // last write time calculation
+        auto lastWrite = fs::last_write_time(path);
+        const auto time = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+            lastWrite - decltype(lastWrite)::clock::now() + std::chrono::system_clock::now()
+        );
 
-    return std::chrono::system_clock::to_time_t(time);
+        return std::chrono::system_clock::to_time_t(time);
+    } catch (...) {
+        return -1; // in case of an error return -1
+    }
 }
 
 std::string FileProperties::getSizeString(const fs::directory_entry& entry) {
     // return a fixed size string for directories (default on Linux)
     if (entry.is_directory())
         return "4 KB";
-
-    // suffixes for size units (B, KB, MB, etc.)
-    constexpr char suffixes[] = "BKMGTPE";
 
     try {
         // get the file size of the entry in bytes (may throw an exception)
@@ -143,15 +160,13 @@ std::string FileProperties::getSizeString(const fs::directory_entry& entry) {
         }
 
         std::stringstream ss;
-        ss << std::fixed;
 
-        if (static_cast<int>(fileSize) == std::ceil(fileSize)) {
-            // don't print the decimal point if the size is an integer
-            ss << std::setprecision(0);
-        } else {
-            // format the size with a precision of 1 digit after the decimal point
-            ss << std::setprecision(1);
-        }
+        // don't print the decimal point if the size is an integer
+        // else format the size with a precision of 1 digit after the decimal point
+        ss << std::fixed << std::setprecision(static_cast<int>(fileSize) == fileSize ? 0 : 1);
+
+        // suffixes for size units (B, KB, MB, etc.)
+        constexpr char suffixes[] = "BKMGTPE";
 
         // adding the size with it's suffix
         ss << fileSize << " " << suffixes[power];

@@ -1,11 +1,18 @@
 #include "FileManager.hpp"
 #include "FileProperties.hpp"
 
+bool FileManager::applyReverse(const bool condition, const bool reverse) {
+    if (reverse)
+        return !condition;
+    return condition;
+}
+
 bool FileManager::lexicographicalCompare(const std::string& first, const std::string& second) {
     return std::lexicographical_compare(
         first.begin(), first.end(),
         second.begin(), second.end(),
         [](const char a, const char b) {
+            // convert characters to lowercase to compare without case sensitivity
             return tolower(a) < tolower(b);
         }
     );
@@ -20,10 +27,10 @@ void FileManager::setEntries(
 ) {
     entries.clear(); // clear previous entries
 
-    entries.emplace_back(".."); // add the previous directory `..`
+    entries.emplace_back(".."); // add the previous directory `..` at the top
 
     for (const auto& item : fs::directory_iterator(rootPath)) {
-        // if hidden files are allowed or file is not hidden add to the entries
+        // only add the item if it's not hidden or hidden files are allowed
         if (showHidden or !FileProperties::isHidden(item))
             entries.push_back(item);
     }
@@ -93,7 +100,7 @@ void FileManager::sortEntries(
                             reverse
                         );
                     }
-                } catch (...) {}
+                } catch (...) {} // fallback in case of exceptions
                 return applyReverse(first.is_regular_file(), reverse);
             } else {
                 return lexicographicalCompare(first.path().string(), second.path().string());
@@ -113,13 +120,13 @@ void FileManager::openFile(const std::string& filePath) {
     std::system((command + " \'" + filePath + "\'").c_str());
 }
 
-// returns the index of a path in a given vector of entries
 int FileManager::getIndex(const fs::path& target, const std::vector<fs::directory_entry>& entries) {
     int index{};
 
+    // iterate over the entries and find the matching path
     for (const auto& entry : entries) {
         if (entry.path() == target)
-            return index;
+            return index; // return the index if found
         ++index;
     }
 
