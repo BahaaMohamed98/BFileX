@@ -8,6 +8,7 @@ UI::UI() {
     Terminal::setTitle("BFileX");    // set the terminal title to "BFileX"
     Cursor::hide();                  // hide the cursor for a cleaner UI
     Screen::clear();                 // clear the screen on startup
+    Screen::disableLineWrap();       // disable line wrapping for more control and better UI
 
     // setting the terminal dimensions
     auto [nWidth, nHeight] = Terminal::size();
@@ -17,6 +18,7 @@ UI::UI() {
 UI::~UI() {
     // restoring the terminal state by
     Cursor::show();                   // show the cursor before exiting
+    Screen::enableLineWrap();         // enable line wrapping back
     Screen::disableAlternateScreen(); // disable alternate screen buffer and return to main screen
 }
 
