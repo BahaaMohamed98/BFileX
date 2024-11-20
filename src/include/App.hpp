@@ -36,7 +36,7 @@ public:
     [[nodiscard]] bool isRunning() const;
     void quit();
     [[nodiscard]] size_t getEntryIndex() const;
-    void setEntryIndex(const size_t& index);
+    void setEntryIndex(size_t index);
 
     void incrementEntryIndex();
     void decrementEntryIndex();
@@ -47,13 +47,13 @@ public:
     void updateEntries();
     void sortEntries();
 
-    void setShowHiddenEntries(const bool& showHiddenFiles);
+    void setShowHiddenEntries(bool showHiddenFiles);
     [[nodiscard]] bool shouldShowHiddenEntries() const;
 
-    void setReverseEntries(const bool& reverseEntries);
+    void setReverseEntries(bool reverseEntries);
     [[nodiscard]] bool shouldReverseEntries() const;
 
-    void setSortType(const SortType& sortType);
+    void setSortType(SortType sortType);
     [[nodiscard]] SortType getSortType() const;
 
     void setCustomFooter(const std::function<void()>& customFooter);
@@ -63,6 +63,6 @@ public:
     void updateUI();
     bool shouldUpdateUI();
 
-    void setShowPreview(const bool& showPreview);
+    void setShowPreview(bool showPreview);
     [[nodiscard]] bool shouldShowPreview() const;
 };

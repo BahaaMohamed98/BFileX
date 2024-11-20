@@ -21,9 +21,9 @@ bool FileManager::lexicographicalCompare(const std::string& first, const std::st
 void FileManager::setEntries(
     const fs::path& rootPath,
     std::vector<fs::directory_entry>& entries,
-    const bool& showHidden,
-    const SortType& sortType,
-    const bool& reverse
+    const bool showHidden,
+    const SortType sortType,
+    const bool reverse
 ) {
     entries.clear(); // clear previous entries
 
@@ -42,9 +42,9 @@ void FileManager::setEntries(
 
 void FileManager::sortEntries(
     std::vector<fs::directory_entry>& entries,
-    const SortType& sortType,
-    const bool& showHidden,
-    const bool& reverse
+    const SortType sortType,
+    const bool showHidden,
+    const bool reverse
 ) {
     std::sort(
         entries.begin(), entries.end(),

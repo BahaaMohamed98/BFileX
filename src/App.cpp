@@ -22,7 +22,7 @@ void App::quit() {
     this->isRunning_.store(false);
 }
 
-void App::setEntryIndex(const size_t& index) {
+void App::setEntryIndex(const size_t index) {
     entryIndex.store(index);
     updateUI();
 }
@@ -75,7 +75,7 @@ std::vector<fs::directory_entry>& App::getEntries() {
     return entries;
 }
 
-void App::setShowHiddenEntries(const bool& showHiddenFiles) {
+void App::setShowHiddenEntries(const bool showHiddenFiles) {
     this->showHiddenEntries = showHiddenFiles;
 }
 
@@ -83,7 +83,7 @@ void App::setShowHiddenEntries(const bool& showHiddenFiles) {
     return showHiddenEntries;
 }
 
-void App::setReverseEntries(const bool& reverseEntries) {
+void App::setReverseEntries(const bool reverseEntries) {
     this->reverseEntries = reverseEntries;
     sortEntries();
 }
@@ -92,7 +92,7 @@ void App::setReverseEntries(const bool& reverseEntries) {
     return reverseEntries;
 }
 
-void App::setSortType(const SortType& sortType) {
+void App::setSortType(const SortType sortType) {
     this->sortType = sortType;
     sortEntries();
 }
@@ -152,7 +152,7 @@ void App::updateUI() {
     uiUpdated = true;
 }
 
-void App::setShowPreview(const bool& showPreview) {
+void App::setShowPreview(const bool showPreview) {
     this->showPreview.store(showPreview);
     updateUI();
 }

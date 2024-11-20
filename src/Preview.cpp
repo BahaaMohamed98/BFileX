@@ -22,7 +22,7 @@ void Preview::readFile(const std::string& path) {
     }
 }
 
-void Preview::printBorderLine(const std::string& leftCorner, const std::string& rightCorner, const int& length) const {
+void Preview::printBorderLine(const std::string& leftCorner, const std::string& rightCorner, const int length) const {
     Printer printer;
 
     // left corner
@@ -41,7 +41,7 @@ Preview::Preview() {
     resize(width, height);
 }
 
-void Preview::resize(const int& width, const int& height) { // todo: change to a simpler way
+void Preview::resize(const int width, const int height) { // todo: change to a simpler way
     terminalWidth = width, terminalHeight = height;
 
     // calculate starting position for the preview box

@@ -178,7 +178,7 @@ void InputHandler::handleQuit() const {
     app.quit();
 }
 
-[[nodiscard]] Action InputHandler::getAction(const char& input) {
+[[nodiscard]] Action InputHandler::getAction(const char input) {
     if (const auto it = keyMap.find(input); it != keyMap.end())
         return it->second;
     return Action::None;

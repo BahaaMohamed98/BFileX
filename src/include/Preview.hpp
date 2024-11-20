@@ -32,10 +32,10 @@ class Preview {
     // following the maxLines and maxLineWidth constraints
     void readFile(const std::string& path);
     // prints a horizontal line border with the given corner strings
-    void printBorderLine(const std::string& leftCorner, const std::string& rightCorner, const int& length) const;
+    void printBorderLine(const std::string& leftCorner, const std::string& rightCorner, int length) const;
 
 public:
     Preview();                                        // todo: refactor to take width and height
-    void resize(const int& width, const int& height); // resize the preview
+    void resize(int width, int height); // resize the preview
     void render(const std::string& filePath);         // render the preview of the given file
 };

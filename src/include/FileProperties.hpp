@@ -88,7 +88,7 @@ public:
     static FileType determineFileType(const fs::path& filePath);
     static Icon getIcon(const fs::directory_entry& entry);
     static Color::Code getColor(const fs::directory_entry& entry);
-    static Color::Code getColor(const EntryType& entryType);
+    static Color::Code getColor(EntryType entryType);
     static bool isHidden(const std::filesystem::directory_entry& entry);
     static bool isExecutable(const std::filesystem::path& path);
     static bool isBinary(const std::string& path);

@@ -9,7 +9,7 @@ enum class SortType {
     None,   // No sorting applied
     Normal, // sort entries lexicographically (by name) (default)
     Time,   // sort entries by last modification time
-    Size,   // sort entries by size
+    Size,   // sort entries by size on disk
 };
 
 class FileManager {
@@ -27,17 +27,17 @@ public:
     static void setEntries(
         const fs::path& rootPath,
         std::vector<fs::directory_entry>& entries,
-        const bool& showHidden,
-        const SortType& sortType,
-        const bool& reverse
+        bool showHidden,
+        SortType sortType,
+        bool reverse
     );
 
     // sorts the given entries vector according to the specified sort type
     static void sortEntries(
         std::vector<fs::directory_entry>& entries,
-        const SortType& sortType,
-        const bool& showHidden,
-        const bool& reverse
+        SortType sortType,
+        bool showHidden,
+        bool reverse
     );
 
     // opens a file using the default system command based on the platform

@@ -18,7 +18,7 @@ class UI {
     Preview preview;
 
     // print a single directory entry with optional highlighting
-    void printEntry(const std::filesystem::directory_entry& entry, const bool& highlight = false) const;
+    void printEntry(const std::filesystem::directory_entry& entry, bool highlight = false) const;
 
 public:
     UI();  // initialize the terminal
@@ -27,11 +27,11 @@ public:
     // render the top bar with the current path
     void renderTopBar(const std::string& currentPath) const;
     // render the entries
-    void renderEntries(const std::vector<fs::directory_entry>& entries, const size_t& currentIndex);
+    void renderEntries(const std::vector<fs::directory_entry>& entries, size_t currentIndex);
     // render the footer with file details or a custom set footer
     void renderFooter(App& app) const;
     // render file preview
     void renderPreview(const std::string& filePath);
     // resize the UI for the terminal
-    void resize(const int& nWidth, const int& nHeight);
+    void resize(int nWidth, int nHeight);
 };

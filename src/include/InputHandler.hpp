@@ -58,7 +58,7 @@ class InputHandler {
     void handleTogglePreview() const;
     void handleQuit() const;
 
-    [[nodiscard]] static Action getAction(const char& input);
+    [[nodiscard]] static Action getAction(char input);
     [[nodiscard]] bool confirmAction(const std::string& prompt, const Color::Code& color = Color::Red) const;
     bool readInputString(const std::string& prompt, std::string& inputBuffer, EntryType entryType) const;
 

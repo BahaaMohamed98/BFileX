@@ -20,7 +20,7 @@ UI::~UI() {
     Screen::disableAlternateScreen(); // disable alternate screen buffer and return to main screen
 }
 
-void UI::printEntry(const std::filesystem::directory_entry& entry, const bool& highlight) const {
+void UI::printEntry(const std::filesystem::directory_entry& entry, const bool highlight) const {
     Printer printer;
     printer.setTextStyle(TextStyle::Bold);
 
@@ -64,7 +64,7 @@ void UI::renderTopBar(const std::string& currentPath) const {
         Printer().println(topBar.substr(lastSlashIndex + 1));
 }
 
-void UI::renderEntries(const std::vector<fs::directory_entry>& entries, const size_t& currentIndex) {
+void UI::renderEntries(const std::vector<fs::directory_entry>& entries, const size_t currentIndex) {
     const size_t totalEntries = entries.size();
     const size_t maxVisibleEntries = terminalHeight - 2; // display height for the entries
 
@@ -140,7 +140,7 @@ void UI::renderPreview(const std::string& filePath) {
     preview.render(filePath);
 }
 
-void UI::resize(const int& nWidth, const int& nHeight) {
+void UI::resize(const int nWidth, const int nHeight) {
     // setting the new terminal dimensions
     terminalWidth = nWidth, terminalHeight = nHeight;
     // the entry highlighting width is limited to half of the screen
