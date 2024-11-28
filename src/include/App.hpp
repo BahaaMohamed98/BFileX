@@ -20,6 +20,8 @@ class App {
     std::atomic<bool> showPreview;
     SortType sortType;
 
+    std::string searchQuery;
+
     std::function<void()> customFooter;
 
     bool uiUpdated;
@@ -37,9 +39,9 @@ public:
     void quit();
     [[nodiscard]] size_t getEntryIndex() const;
     void setEntryIndex(size_t index);
-
     void incrementEntryIndex();
     void decrementEntryIndex();
+
     fs::directory_entry& getCurrentEntry();
     std::vector<fs::directory_entry>& getEntries();
 
@@ -55,6 +57,10 @@ public:
 
     void setSortType(SortType sortType);
     [[nodiscard]] SortType getSortType() const;
+
+    void setSearchQuery(const std::string& searchQuery);
+    void resetSearchQuery();
+    std::string getSearchQuery() const;
 
     void setCustomFooter(const std::function<void()>& customFooter);
     void resetFooter();

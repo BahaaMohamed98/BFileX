@@ -43,11 +43,14 @@ void BFileX::run() {
     signal(SIGINT, signalHandler);
     signal(SIGTERM, signalHandler);
 
+    // handling user input
     inputHandler.handleInput();
 
     while (app.isRunning()) {
+        // a brief delay to lower flickering and cpu usage
         Terminal::sleep(60);
 
+        // render app only when necessary
         if (app.shouldUpdateUI() or terminalResized())
             renderApp();
     }

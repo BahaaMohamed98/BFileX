@@ -51,6 +51,7 @@ void App::updateEntries() {
     FileManager::setEntries(
         fs::current_path(),
         getEntries(),
+        getSearchQuery(),
         shouldShowHiddenEntries(),
         getSortType(),
         shouldReverseEntries()
@@ -99,6 +100,20 @@ void App::setSortType(const SortType sortType) {
 
 [[nodiscard]] SortType App::getSortType() const {
     return sortType;
+}
+
+void App::setSearchQuery(const std::string& searchQuery) {
+    this->searchQuery = searchQuery;
+    updateEntries();
+}
+
+void App::resetSearchQuery() {
+    searchQuery.clear();
+    updateEntries();
+}
+
+std::string App::getSearchQuery() const {
+    return searchQuery;
 }
 
 void App::setCustomFooter(const std::function<void()>& customFooter) {

@@ -1,4 +1,5 @@
 #include "FileManager.hpp"
+#include <filesystem>
 #include "FileProperties.hpp"
 
 bool FileManager::applyReverse(const bool condition, const bool reverse) {
@@ -18,9 +19,32 @@ bool FileManager::lexicographicalCompare(const std::string& first, const std::st
     );
 }
 
+std::vector<fs::directory_entry> FileManager::searchEntries(const std::string& searchQuery,
+                                                            const std::vector<fs::directory_entry>& entries) {
+    std::vector<fs::directory_entry> results;
+
+    for (const auto& entry : entries) {
+        std::string name = entry.path().string();
+        
+        if (const auto seperatorIndex = name.find_last_of(fs::path::preferred_separator);
+            seperatorIndex != std::string::npos) {
+            name = name.substr(seperatorIndex);
+        }
+
+        if (name.find(searchQuery) != std::string::npos) {
+            results.push_back(entry);
+        }
+    }
+
+    results.emplace_back(fs::path(".."));
+
+    return results;
+}
+
 void FileManager::setEntries(
     const fs::path& rootPath,
     std::vector<fs::directory_entry>& entries,
+    const std::string& searchQuery,
     const bool showHidden,
     const SortType sortType,
     const bool reverse
@@ -35,9 +59,16 @@ void FileManager::setEntries(
             entries.push_back(item);
     }
 
+    // if there exists a search query
+    if (!searchQuery.empty()) {
+        // filter out entries based on search results
+        entries = searchEntries(searchQuery, entries);
+    }
+
     // sort the entries according to the sort type
-    if (sortType != SortType::None)
+    if (sortType != SortType::None) {
         sortEntries(entries, sortType, showHidden, reverse);
+    }
 }
 
 void FileManager::sortEntries(
@@ -50,10 +81,12 @@ void FileManager::sortEntries(
         entries.begin(), entries.end(),
         [&](const fs::directory_entry& first, const fs::directory_entry& second) {
             // rank the previous directory ".." at the top
-            if (first.path().filename() == "..")
+            if (first.path().filename() == "..") {
                 return true;
-            if (second.path().filename() == "..")
+            }
+            if (second.path().filename() == "..") {
                 return false;
+            }
 
             if (sortType == SortType::Normal) {
                 // rank hidden files higher if shown
@@ -61,16 +94,18 @@ void FileManager::sortEntries(
                     const bool firstIsHidden = FileProperties::isHidden(first);
                     const bool secondIsHidden = FileProperties::isHidden(second);
 
-                    if (firstIsHidden != secondIsHidden)
+                    if (firstIsHidden != secondIsHidden) {
                         return applyReverse(firstIsHidden, reverse);
+                    }
                 }
 
                 // rank directories higher
                 const bool firstIsDir = first.is_directory();
                 const bool secondIsDir = second.is_directory();
 
-                if (firstIsDir != secondIsDir)
+                if (firstIsDir != secondIsDir) {
                     return applyReverse(firstIsDir, reverse);
+                }
 
                 // rank based on the lexicogrphical file name comaparision
                 return applyReverse(lexicographicalCompare(first.path().string(), second.path().string()), reverse);

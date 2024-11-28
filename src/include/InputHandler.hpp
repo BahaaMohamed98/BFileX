@@ -19,6 +19,8 @@ enum class Action {
     MakeDirectory,
     ToggleHideEntries,
     ToggleHelp,
+    ToggleSearch,
+    ESC,
     Quit,
 };
 
@@ -39,6 +41,8 @@ class InputHandler {
         {'R', Action::ToggleReverseEntries},
         {'H', Action::ToggleHideEntries},
         {'p', Action::TogglePreview},
+        {'/', Action::ToggleSearch},
+        {keyCode::Esc, Action::ESC},
         {'q', Action::Quit},
     };
 
@@ -56,6 +60,7 @@ class InputHandler {
     void handleToggleReverseEntries() const;
     void handleToggleHideEntries() const;
     void handleTogglePreview() const;
+    void handleToggleSearch() const;
     void handleQuit() const;
 
     [[nodiscard]] static Action getAction(char input);

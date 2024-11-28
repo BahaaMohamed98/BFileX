@@ -1,8 +1,6 @@
 .idea
 cmake-build-release
 cmake-build-debug
-build/test
-build/Build
-build/tmp
+build/*
 countLines.zsh
 Bfilex-todo.txt

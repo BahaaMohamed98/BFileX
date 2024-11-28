@@ -127,6 +127,17 @@ void InputHandler::handleTogglePreview() const {
     app.setShowPreview(!app.shouldShowPreview());
 }
 
+void InputHandler::handleToggleSearch() const {
+    std::string inputBuffer = app.getSearchQuery();
+
+    // return if user cancelled
+    if (!readInputString("Search: ", inputBuffer, FileProperties::determineEntryType(app.getCurrentEntry())))
+        return;
+
+    app.setSearchQuery(inputBuffer);
+    app.resetFooter();
+}
+
 void InputHandler::handleToggleSortByTime() const {
     if (app.getSortType() != SortType::Time) {
         app.setSortType(SortType::Time);
@@ -287,8 +298,14 @@ void InputHandler::handleInput() {
                     case Action::TogglePreview:
                         handleTogglePreview();
                         break;
+                    case Action::ToggleSearch:
+                        handleToggleSearch();
+                        break;
                     case Action::Quit:
                         handleQuit();
+                        break;
+                    case Action::ESC:
+                        app.resetSearchQuery();
                         break;
                     default:
                         break;

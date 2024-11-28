@@ -2,6 +2,19 @@
 #include "InputHandler.hpp"
 
 class CommandLineParser {
+    class CommandLinePrinter {
+        static constexpr int indentWidth = 10; // Alignment width for printed commands
+
+        static void printCommand(const std::string& command, const std::string& description,
+                                 bool trailingNewLine = true);
+
+    public:
+        static void printUsage();
+        static void printHelp();
+        static void printErrorUnknownCommand(const std::string& command); // Print error for unrecognized commands
+    };
+
+private:
     static inline std::unordered_map<std::string, Action> commandToAction{
         {"-t", Action::ToggleSortByTime},
         {"--time", Action::ToggleSortByTime},
@@ -22,8 +35,6 @@ class CommandLineParser {
         {"--help", Action::ToggleHelp},
     };
 
-    static void printUsage();
-    static void printHelp();
     static Action getAction(const std::string& command);
 
 public:

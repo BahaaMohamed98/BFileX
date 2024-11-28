@@ -21,12 +21,17 @@ class FileManager {
     // case-insensitive lexicographical comparison
     static bool lexicographicalCompare(const std::string& first, const std::string& second);
 
+    // filters entries based on the search query and returns the new vector
+    static std::vector<fs::directory_entry> searchEntries(const std::string& searchQuery,
+                                                          const std::vector<fs::directory_entry>& entries);
+
 public:
     // populates the entries vector with directory entries from the given path, with sorting options
     // including flags for showing hidden files and reversing the order
     static void setEntries(
         const fs::path& rootPath,
         std::vector<fs::directory_entry>& entries,
+        const std::string& searchQuery,
         bool showHidden,
         SortType sortType,
         bool reverse

@@ -1,28 +1,20 @@
 #include "CommandLineParser.hpp"
+#include "Terminal++.hpp"
 
-void CommandLineParser::printUsage() {
+void CommandLineParser::CommandLinePrinter::printUsage() {
     Printer().println("BFileX [OPTIONS]\n");
 }
 
-void CommandLineParser::printHelp() {
+void CommandLineParser::CommandLinePrinter::printHelp() {
     Printer printer;
-    constexpr int width = 10;
 
     printer.setTextColor(Color::Blue).println("\nBFileX")
-           .resetColors().println(std::setw(width), "A simple terminal-based file explorer\n");
+           .resetColors().println(std::setw(indentWidth), "A simple terminal-based file explorer\n");
 
-    printer.setTextColor(Color::Yellow).print("USAGE:\n", std::setw(width)).resetColors();
+    printer.setTextColor(Color::Yellow).print("USAGE:\n", std::setw(indentWidth)).resetColors();
     printUsage();
 
     printer.setTextColor(Color::Yellow).println("OPTIONS:");
-
-    auto printCommand = [&](const std::string& command, const std::string& description, const bool newLine = true) {
-        printer.setTextColor(Color::Cyan).println(std::setw(width), command)
-               .resetColors().println(std::setw(width + 7), description);
-
-        if (newLine)
-            printer.println();
-    };
 
     printCommand("-t, --time", "Sort entries by time");
     printCommand("-s, --size", "Sort entries by size");
@@ -30,6 +22,24 @@ void CommandLineParser::printHelp() {
     printCommand("-a, --all", "Show all entries");
     printCommand("-np, --no-preview", "Don't show file preview");
     printCommand("-h, --help", "Show help screen", false);
+}
+
+void CommandLineParser::CommandLinePrinter::printCommand(const std::string& command, const std::string& description,
+                                                         const bool trailingNewLine) {
+    Printer printer;
+    printer.setTextColor(Color::Cyan).println(std::setw(indentWidth), command)
+           .resetColors().println(std::setw(indentWidth + 7), description);
+
+    if (trailingNewLine)
+        printer.println();
+}
+
+void CommandLineParser::CommandLinePrinter::printErrorUnknownCommand(const std::string& command) {
+    Printer(Color::Red).print("Error: ");
+    Printer().print("Unknown command: \"")
+             .setTextColor(Color::Cyan).print(command).resetColors().println("\"\n");
+
+    Printer().print("For for more information try ").setTextColor(Color::Cyan).println("--help");
 }
 
 Action CommandLineParser::getAction(const std::string& command) {
@@ -65,15 +75,11 @@ void CommandLineParser::parse(const int argc, char** argv) {
                 app.setShowPreview(false);
                 break;
             case Action::ToggleHelp:
-                printHelp();
-                exit(0);
+                CommandLinePrinter::printHelp();
+                exit(EXIT_SUCCESS);
             default:
-                Printer(Color::Red).print("Error: ");
-                Printer().print("Unknown command: \"")
-                         .setTextColor(Color::Cyan).print(command).resetColors().println("\"\n");
-
-                Printer().print("For for more information try ").setTextColor(Color::Cyan).println("--help");
-                exit(1);
+                CommandLinePrinter::printErrorUnknownCommand(command);
+                exit(EXIT_FAILURE);
         }
     }
 }

@@ -2,6 +2,7 @@
 #include "CommandLineParser.hpp"
 
 int main(const int argc, char** argv) {
+    // handling command line options
     CommandLineParser::parse(argc, argv);
 
     BFileX BFileX;
