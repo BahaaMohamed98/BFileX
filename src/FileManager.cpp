@@ -1,4 +1,5 @@
 #include "FileManager.hpp"
+#include <algorithm>
 #include <filesystem>
 #include "FileProperties.hpp"
 
@@ -25,7 +26,7 @@ std::vector<fs::directory_entry> FileManager::searchEntries(const std::string& s
 
     for (const auto& entry : entries) {
         std::string name = entry.path().string();
-        
+
         if (const auto seperatorIndex = name.find_last_of(fs::path::preferred_separator);
             seperatorIndex != std::string::npos) {
             name = name.substr(seperatorIndex);

@@ -1,6 +1,7 @@
 #include "FileProperties.hpp"
-#include <fstream>
+#include <algorithm>
 #include <cmath>
+#include <fstream>
 
 FileProperties::Icon::Icon(std::string icon) : representation(std::move(icon)) {}
 FileProperties::Icon::Icon() : representation(iconMap[EntryType::Unknown].representation) {}
