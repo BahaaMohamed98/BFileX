@@ -30,10 +30,10 @@ void BFileX::renderApp() {
 
     // show preview if enabled
     if (app.shouldShowPreview() and
-        FileProperties::determineEntryType(app.getCurrentEntry()) == EntryType::RegularFile and
-        !FileProperties::isBinary(app.getCurrentEntry().path().string()) // only show preview if it's normal text file
+        FileProperties::Types::determineEntryType(app.getCurrentEntry()) == EntryType::RegularFile and
+        !FileProperties::Utilities::isBinary(app.getCurrentEntry().path().string()) // only show preview if it's normal text file
     )
-        ui.renderPreview(FileProperties::getName(app.getCurrentEntry()).string());
+        ui.renderPreview(FileProperties::MetaData::getName(app.getCurrentEntry()).string());
 
     Printer::flush();
 }

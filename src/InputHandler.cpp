@@ -14,7 +14,7 @@ void InputHandler::handleDown() const {
 void InputHandler::handleEnter() const {
     if (app.getCurrentEntry().is_directory()) {
         app.changeDirectory(
-            fs::current_path() / FileProperties::getName(app.getCurrentEntry())
+            fs::current_path() / FileProperties::MetaData::getName(app.getCurrentEntry())
         );
     } else if (app.getCurrentEntry().is_regular_file()) {
         FileManager::openFile(
@@ -29,14 +29,14 @@ void InputHandler::handleBack() const {
 
 void InputHandler::handleRename() const {
     // initializing the input buffer to the current file name
-    std::string inputBuffer = FileProperties::getName(app.getCurrentEntry()).string();
+    std::string inputBuffer = FileProperties::MetaData::getName(app.getCurrentEntry()).string();
 
     // return directly if the user tries to rename the `..` directory (do nothing)
     if (inputBuffer == "..")
         return;
 
     // return if user cancelled
-    if (!readInputString("New name: ", inputBuffer, FileProperties::determineEntryType(app.getCurrentEntry())))
+    if (!readInputString("New name: ", inputBuffer, FileProperties::Types::determineEntryType(app.getCurrentEntry())))
         return;
 
     try {
@@ -67,7 +67,7 @@ void InputHandler::handleRename() const {
         app.setCustomFooter([=] {
             Printer(Color::Green)
                     .setTextStyle(TextStyle::Bold)
-                    .print("Renamed ", FileProperties::getName(oldEntry), " to: ", newPath.filename());
+                    .print("Renamed ", FileProperties::MetaData::getName(oldEntry), " to: ", newPath.filename());
         });
     } catch (...) {
         app.setCustomFooter([] {
@@ -77,7 +77,7 @@ void InputHandler::handleRename() const {
 }
 
 void InputHandler::handleDelete() const {
-    const fs::path targetEntry = FileProperties::getName(app.getCurrentEntry());
+    const fs::path targetEntry = FileProperties::MetaData::getName(app.getCurrentEntry());
 
     // return when trying to delete `..`
     if (targetEntry.string() == "..")
@@ -89,7 +89,7 @@ void InputHandler::handleDelete() const {
 
     try {
         // if entry is a non empty directory prompt the user about recursively deleting it
-        if (FileProperties::determineEntryType(app.getCurrentEntry()) == EntryType::Directory and
+        if (FileProperties::Types::determineEntryType(app.getCurrentEntry()) == EntryType::Directory and
             !is_empty(app.getCurrentEntry())) {
 
             // return if the answer is not yes
@@ -131,7 +131,7 @@ void InputHandler::handleToggleSearch() const {
     std::string inputBuffer = app.getSearchQuery();
 
     // return if user cancelled
-    if (!readInputString("Search: ", inputBuffer, FileProperties::determineEntryType(app.getCurrentEntry())))
+    if (!readInputString("Search: ", inputBuffer, FileProperties::Types::determineEntryType(app.getCurrentEntry())))
         return;
 
     app.setSearchQuery(inputBuffer);
@@ -216,7 +216,7 @@ bool InputHandler::readInputString(const std::string& prompt, std::string& input
     Cursor::show();
 
     app.setCustomFooter([&] {
-        Printer(FileProperties::getColor(entryType))
+        Printer(FileProperties::Mapper::getColor(entryType))
                 .print(prompt, inputBuffer);
     });
 

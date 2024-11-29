@@ -27,7 +27,7 @@ void UI::printEntry(const std::filesystem::directory_entry& entry, const bool hi
     printer.setTextStyle(TextStyle::Bold);
 
     // get the color based on entry type
-    const Color::Code color = FileProperties::getColor(entry);
+    const Color::Code color = FileProperties::Mapper::getColor(entry);
 
     if (highlight) // highlights the currently selected entry by changing the background color
         printer.setTextColor(Color::Black).setBackgroundColor(color);
@@ -35,7 +35,8 @@ void UI::printEntry(const std::filesystem::directory_entry& entry, const bool hi
         printer.setTextColor(color);
 
     // construct the string to be printed with icon and file name
-    std::string entryStr = FileProperties::getIcon(entry).representation + FileProperties::getName(entry).string();
+    std::string entryStr = FileProperties::Mapper::getIcon(entry).representation +
+                           FileProperties::MetaData::getName(entry).string();
 
     // limiting the number of characters printed to terminal width
     if (static_cast<int>(entryStr.size()) >= highlightWidth)
@@ -100,7 +101,7 @@ void UI::renderFooter(App& app) const {
         return footer();
 
     // getting the entry's last write time
-    const time_t lastWriteTime = FileProperties::getLastWriteTime(app.getCurrentEntry().path());
+    const time_t lastWriteTime = FileProperties::MetaData::getLastWriteTime(app.getCurrentEntry().path());
 
     // Print file type, permissions, and last write time
     Printer().print(
@@ -109,7 +110,7 @@ void UI::renderFooter(App& app) const {
         app.getCurrentEntry().is_directory() ? "d" : app.getCurrentEntry().is_symlink() ? "l" : ".",
 
         // print entry's permissions
-        FileProperties::permissionsToString(app.getCurrentEntry()),
+        FileProperties::MetaData::getPermissionsAsString(app.getCurrentEntry()),
 
         // padding for spacing
         "  ",
@@ -125,7 +126,7 @@ void UI::renderFooter(App& app) const {
     );
 
     // printing the formatted size of the current entry
-    Printer().print("  ", FileProperties::getSizeString(app.getCurrentEntry()));
+    Printer().print("  ", FileProperties::MetaData::getSizeAsString(app.getCurrentEntry()));
 
     // show the current entry index and total entries in the directory
     const std::string directoryNumber =
