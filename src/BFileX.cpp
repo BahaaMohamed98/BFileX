@@ -1,16 +1,17 @@
 #include "BFileX.hpp"
 #include <csignal>
 #include "App.hpp"
+#include "CommandLineParser.hpp"
 #include "FileProperties.hpp"
 #include "Terminal++.hpp"
 
 BFileX::BFileX()
-    : app(App::getInstance()), inputHandler(InputHandler::getInstance()) {}
+    : app(App::getInstance()) {}
 
-void BFileX::signalHandler(int signal) {
+void BFileX::signalHandler(const int signal) {
     Cursor::show();
     Screen::disableAlternateScreen();
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 
 bool BFileX::terminalResized() {
@@ -21,7 +22,7 @@ bool BFileX::terminalResized() {
     return false;
 }
 
-void BFileX::renderApp() {
+void BFileX::renderUI() {
     Screen::clear();
 
     ui.renderTopBar((fs::current_path() / app.getCurrentEntry()).string());
@@ -31,27 +32,38 @@ void BFileX::renderApp() {
     // show preview if enabled
     if (app.shouldShowPreview() and
         FileProperties::Types::determineEntryType(app.getCurrentEntry()) == EntryType::RegularFile and
-        !FileProperties::Utilities::isBinary(app.getCurrentEntry().path().string()) // only show preview if it's normal text file
-    )
+        !FileProperties::Utilities::isBinary(app.getCurrentEntry().path().string())
+        // only show preview if it's normal text file
+    ) {
         ui.renderPreview(FileProperties::MetaData::getName(app.getCurrentEntry()).string());
+    }
 
     Printer::flush();
 }
 
-void BFileX::run() {
-    // setup signal handling
-    signal(SIGINT, signalHandler);
-    signal(SIGTERM, signalHandler);
-
+void BFileX::startMainLoop() {
     // handling user input
-    inputHandler.handleInput();
+    InputHandler::getInstance().handleInput();
 
     while (app.isRunning()) {
         // a brief delay to lower flickering and cpu usage
         Terminal::sleep(60);
 
         // render app only when necessary
-        if (app.shouldUpdateUI() or terminalResized())
-            renderApp();
+        if (app.shouldUpdateUI() or terminalResized()) {
+            renderUI();
+        }
     }
+}
+
+void BFileX::run(const int argc, char** argv) {
+    // handling command line options
+    CommandLineParser::parse(argc, argv);
+
+    // setup signal handling
+    signal(SIGINT, signalHandler);
+    signal(SIGTERM, signalHandler);
+
+    BFileX BFileX;
+    BFileX.startMainLoop();
 }

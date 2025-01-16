@@ -7,13 +7,14 @@ class BFileX {
     UI ui;
     App& app;
     Terminal terminal;
-    InputHandler& inputHandler;
 
     static void signalHandler(int);
     [[nodiscard]] bool terminalResized();
-    void renderApp();
+    void renderUI();
+
+    void startMainLoop();
+    BFileX();
 
 public:
-    BFileX();
-    void run();
+    static void run(int argc, char** argv);
 };
