@@ -17,6 +17,7 @@ enum class Action {
     ToggleSortBySize,
     ToggleReverseEntries,
     MakeDirectory,
+    CreateFile,
     ToggleHideEntries,
     ToggleHelp,
     ToggleSearch,
@@ -53,6 +54,7 @@ class InputHandler {
     void handleEnter() const;
     void handleBack() const;
     void handleMakeDirectory() const;
+    void handleCreateFile();
     void handleRename() const;
     void handleDelete() const;
     void handleToggleSortByTime() const;

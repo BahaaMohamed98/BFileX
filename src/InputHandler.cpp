@@ -91,7 +91,6 @@ void InputHandler::handleDelete() const {
         // if entry is a non empty directory prompt the user about recursively deleting it
         if (FileProperties::Types::determineEntryType(app.getCurrentEntry()) == EntryType::Directory and
             !is_empty(app.getCurrentEntry())) {
-
             // return if the answer is not yes
             if (!confirmAction("Directory is not empty, delete it recursively? (y/n) "))
                 return app.resetFooter();
@@ -102,7 +101,7 @@ void InputHandler::handleDelete() const {
                 Printer printer(Color::Green);
 
                 printer.setTextStyle(TextStyle::Bold)
-                       .print("Deleted entry: ", targetEntry);
+                        .print("Deleted entry: ", targetEntry);
 
                 if (deletedEntriess > 1)
                     printer.print(" and ", deletedEntriess - 1, " other ", (deletedEntriess > 2 ? "entries" : "entry"));
@@ -176,6 +175,38 @@ void InputHandler::handleMakeDirectory() const {
     } else {
         app.setCustomFooter([] {
             Printer(Color::Red).setTextStyle(TextStyle::Bold).print("Failed to create directory!");
+        });
+    }
+}
+
+void InputHandler::handleCreateFile() {
+    std::string inputBuffer;
+
+    if (!readInputString("Enter file name: ", inputBuffer, EntryType::RegularFile)) {
+        return;
+    }
+
+    if (fs::exists(inputBuffer)) {
+        app.setCustomFooter([] {
+            Printer(Color::Red).setTextStyle(TextStyle::Bold).print("File already exists!");
+        });
+        return;
+    }
+
+    if (std::ofstream(inputBuffer).is_open()) {
+        app.setCustomFooter([=] {
+            Printer(Color::Green).setTextStyle(TextStyle::Bold).print("Created file: ", inputBuffer);
+        });
+
+        app.updateEntries();
+
+        const int fileIndex = FileManager::getIndex(fs::current_path() / fs::path(inputBuffer), app.getEntries());
+
+        // place cursor on the newly created file
+        app.setEntryIndex(fileIndex);
+    } else {
+        app.setCustomFooter([] {
+            Printer(Color::Red).setTextStyle(TextStyle::Bold).print("Failed to create file!");
         });
     }
 }
@@ -281,6 +312,10 @@ void InputHandler::handleInput() {
                         break;
                     case Action::MakeDirectory:
                         handleMakeDirectory();
+                        iterations = 0;
+                        break;
+                    case Action::CreateFile:
+                        handleCreateFile();
                         iterations = 0;
                         break;
                     case Action::ToggleSortByTime:
