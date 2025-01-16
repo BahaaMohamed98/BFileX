@@ -30,7 +30,6 @@ void BFileX::renderUI() {
 
     ui.renderTopBar((fs::current_path() / app.getCurrentEntry()).string());
     ui.renderEntries(app.getEntries(), app.getEntryIndex());
-    ui.renderFooter(app);
 
     // show preview if enabled
     if (app.shouldShowPreview() and
@@ -40,6 +39,8 @@ void BFileX::renderUI() {
     ) {
         ui.renderPreview(FileProperties::MetaData::getName(app.getCurrentEntry()).string());
     }
+
+    ui.renderFooter(app);
 
     Printer::flush();
 }
