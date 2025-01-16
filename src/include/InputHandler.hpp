@@ -35,6 +35,7 @@ class InputHandler {
         {'l', Action::Enter}, {keyCode::ArrowRight, Action::Enter}, {keyCode::Enter, Action::Enter},
         {'h', Action::Back}, {keyCode::ArrowLeft, Action::Back},
         {'m', Action::MakeDirectory},
+        {'c', Action::CreateFile},
         {'r', Action::Rename},
         {'d', Action::Delete},
         {'t', Action::ToggleSortByTime},
@@ -54,7 +55,7 @@ class InputHandler {
     void handleEnter() const;
     void handleBack() const;
     void handleMakeDirectory() const;
-    void handleCreateFile();
+    void handleCreateFile() const;
     void handleRename() const;
     void handleDelete() const;
     void handleToggleSortByTime() const;

@@ -1,4 +1,5 @@
 #include "InputHandler.hpp"
+#include <fstream>
 
 InputHandler::InputHandler()
     : app(App::getInstance()) {}
@@ -179,7 +180,7 @@ void InputHandler::handleMakeDirectory() const {
     }
 }
 
-void InputHandler::handleCreateFile() {
+void InputHandler::handleCreateFile() const {
     std::string inputBuffer;
 
     if (!readInputString("Enter file name: ", inputBuffer, EntryType::RegularFile)) {
