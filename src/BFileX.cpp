@@ -9,9 +9,12 @@ BFileX::BFileX()
     : app(App::getInstance()) {}
 
 void BFileX::signalHandler(const int signal) {
+    App::getInstance().quit();
+
     Cursor::show();
     Screen::disableAlternateScreen();
-    exit(EXIT_SUCCESS);
+
+    exit(EXIT_FAILURE);
 }
 
 bool BFileX::terminalResized() {

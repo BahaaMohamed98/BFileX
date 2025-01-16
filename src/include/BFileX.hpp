@@ -8,7 +8,7 @@ class BFileX {
     App& app;
     Terminal terminal;
 
-    static void signalHandler(int);
+    static void signalHandler(int signal);
     [[nodiscard]] bool terminalResized();
     void renderUI();
 

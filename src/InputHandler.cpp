@@ -355,5 +355,5 @@ void InputHandler::handleInput() {
                 }
             }
         }
-    );
+        , true);
 }
