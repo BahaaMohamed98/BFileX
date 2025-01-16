@@ -5,7 +5,6 @@ App::App()
     : isRunning_(true), entryIndex(0), reverseEntries(false), showHiddenEntries(false),
       showPreview(true), sortType(SortType::Normal), customFooter(nullptr),
       uiUpdated(true), entriesUpdated(true) {
-
     updateEntries();
 }
 
@@ -137,6 +136,7 @@ void App::changeDirectory(const fs::path& path) {
     entriesIndices[fs::current_path()] = getEntryIndex();
 
     fs::current_path(path); // change directory
+    resetSearchQuery();     // reset search query after changing directory
     updateEntries();        // get the new entries
 
     // if entry visited before get it's stored index
