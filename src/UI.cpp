@@ -94,7 +94,7 @@ void UI::renderEntries(const std::vector<fs::directory_entry>& entries, const si
 
 void UI::renderFooter(App& app) const {
     // move to the bottom of the screen to render the footer
-    Cursor::moveTo(1, Terminal::size().height);
+    Cursor::moveTo(1, terminalHeight);
 
     // if a custom footer is set run it and return
     if (const auto& footer = app.getCustomFooter(); footer != nullptr)
