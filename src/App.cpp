@@ -175,3 +175,13 @@ void App::setShowPreview(const bool showPreview) {
 bool App::shouldShowPreview() const {
     return showPreview.load();
 }
+
+void App::setStartingEntry(const fs::path& path) {
+    try {
+        changeDirectory(path);
+    } catch (const fs::filesystem_error&) {
+        setCustomFooter([=] {
+            Printer(Color::Red).print("Invalid directory path: ", path);
+        });
+    }
+}

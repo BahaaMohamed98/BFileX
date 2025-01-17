@@ -12,6 +12,7 @@ class CommandLineParser {
         static void printUsage();
         static void printHelp();
         static void printErrorUnknownCommand(const std::string& command); // Print error for unrecognized commands
+        static void printErrorMultipleEntries(); // Print error for unrecognized commands
     };
 
 private:
@@ -35,8 +36,7 @@ private:
         {"--help", Action::ToggleHelp},
     };
 
-    static Action getAction(const std::string& command);
-
+    static Action getAction(const std::string& argument);
 public:
     static void parse(int argc, char** argv);
 };

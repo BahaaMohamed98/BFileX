@@ -21,6 +21,7 @@ enum class Action {
     ToggleHideEntries,
     ToggleHelp,
     ToggleSearch,
+    SetStartingDirectory,
     ESC,
     Quit,
 };

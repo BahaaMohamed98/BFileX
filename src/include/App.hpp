@@ -71,4 +71,6 @@ public:
 
     void setShowPreview(bool showPreview);
     [[nodiscard]] bool shouldShowPreview() const;
+
+    void setStartingEntry(const fs::path& path);
 };
