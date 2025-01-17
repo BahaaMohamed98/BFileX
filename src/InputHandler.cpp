@@ -33,12 +33,14 @@ void InputHandler::handleRename() const {
     std::string inputBuffer = FileProperties::MetaData::getName(app.getCurrentEntry()).string();
 
     // return directly if the user tries to rename the `..` directory (do nothing)
-    if (inputBuffer == "..")
+    if (inputBuffer == "..") {
         return;
+    }
 
     // return if user cancelled
-    if (!readInputString("New name: ", inputBuffer, FileProperties::Types::determineEntryType(app.getCurrentEntry())))
+    if (!readInputString("New name: ", inputBuffer, FileProperties::Types::determineEntryType(app.getCurrentEntry()))) {
         return;
+    }
 
     try {
         // file entry before renaming
@@ -46,14 +48,16 @@ void InputHandler::handleRename() const {
         const fs::path newPath = fs::current_path() / fs::path(inputBuffer);
 
         // return if the name was not changed
-        if (oldEntry.path() == newPath)
+        if (oldEntry.path() == newPath) {
             return app.resetFooter();
+        }
 
         // if entry already exists prompt the user about overriding it
         if (fs::exists(newPath)) {
             // return if the answer is not yes
-            if (!confirmAction("Entry already exists override it? (y/n) "))
+            if (!confirmAction("Entry already exists override it? (y/n) ")) {
                 return app.resetFooter();
+            }
         }
 
         // rename the entry to the specified name
@@ -70,7 +74,7 @@ void InputHandler::handleRename() const {
                     .setTextStyle(TextStyle::Bold)
                     .print("Renamed ", FileProperties::MetaData::getName(oldEntry), " to: ", newPath.filename());
         });
-    } catch (...) {
+    } catch (const fs::filesystem_error&) {
         app.setCustomFooter([] {
             Printer(Color::Red).setTextStyle(TextStyle::Bold).print("Failed to rename entry!");
         });
@@ -81,12 +85,14 @@ void InputHandler::handleDelete() const {
     const fs::path targetEntry = FileProperties::MetaData::getName(app.getCurrentEntry());
 
     // return when trying to delete `..`
-    if (targetEntry.string() == "..")
+    if (targetEntry.string() == "..") {
         return;
+    }
 
     // return if the answer is not yes
-    if (!confirmAction("Are you sure you want to delete \"" + std::string{targetEntry} + "\"? (y/n) "))
+    if (!confirmAction("Are you sure you want to delete \"" + std::string{targetEntry} + "\"? (y/n) ")) {
         return app.resetFooter();
+    }
 
     try {
         // if entry is a non empty directory prompt the user about recursively deleting it
@@ -104,8 +110,9 @@ void InputHandler::handleDelete() const {
                 printer.setTextStyle(TextStyle::Bold)
                         .print("Deleted entry: ", targetEntry);
 
-                if (deletedEntriess > 1)
+                if (deletedEntriess > 1) {
                     printer.print(" and ", deletedEntriess - 1, " other ", (deletedEntriess > 2 ? "entries" : "entry"));
+                }
             });
         } else {
             fs::remove(app.getCurrentEntry().path());
@@ -116,7 +123,7 @@ void InputHandler::handleDelete() const {
 
         // refresh entries
         app.updateEntries();
-    } catch (...) {
+    } catch (const fs::filesystem_error&) {
         app.setCustomFooter([] {
             Printer(Color::Red).setTextStyle(TextStyle::Bold).print("Failed to delete entry!");
         });
@@ -131,8 +138,9 @@ void InputHandler::handleToggleSearch() const {
     std::string inputBuffer = app.getSearchQuery();
 
     // return if user cancelled
-    if (!readInputString("Search: ", inputBuffer, FileProperties::Types::determineEntryType(app.getCurrentEntry())))
+    if (!readInputString("Search: ", inputBuffer, FileProperties::Types::determineEntryType(app.getCurrentEntry()))) {
         return;
+    }
 
     app.setSearchQuery(inputBuffer);
     app.resetFooter();
@@ -162,10 +170,26 @@ void InputHandler::handleMakeDirectory() const {
     std::string inputBuffer;
 
     // return if user cancelled
-    if (!readInputString("Enter directory name: ", inputBuffer, EntryType::Directory))
+    if (!readInputString("Enter directory name: ", inputBuffer, EntryType::Directory)) {
         return;
+    }
 
-    if (fs::create_directory(fs::path(inputBuffer))) {
+    bool directoryCreated;
+
+    try {
+        if (fs::exists(inputBuffer)) {
+            app.setCustomFooter([] {
+                Printer(Color::Red).setTextStyle(TextStyle::Bold).print("File already exists!");
+            });
+            return;
+        }
+
+        directoryCreated = fs::create_directory(fs::path(inputBuffer));
+    } catch (const fs::filesystem_error&) {
+        directoryCreated = false;
+    }
+
+    if (directoryCreated) {
         app.setCustomFooter([=] {
             Printer(Color::Green).setTextStyle(TextStyle::Bold).print("Created directory: ", inputBuffer);
         });
@@ -227,7 +251,7 @@ void InputHandler::handleQuit() const {
     return Action::None;
 }
 
-bool InputHandler::confirmAction(const std::string& prompt, const Color::Code& color) const {
+bool InputHandler::confirmAction(const std::string_view prompt, const Color::Code& color) const {
     Cursor::show();
 
     app.setCustomFooter([&] {
@@ -243,7 +267,7 @@ bool InputHandler::confirmAction(const std::string& prompt, const Color::Code& c
 
 // gets input from the user interactively into the buffer
 // return true on success false if user cancelled
-bool InputHandler::readInputString(const std::string& prompt, std::string& inputBuffer,
+bool InputHandler::readInputString(const std::string_view prompt, std::string& inputBuffer,
                                    const EntryType entryType) const {
     Cursor::show();
 
@@ -259,8 +283,10 @@ bool InputHandler::readInputString(const std::string& prompt, std::string& input
                 isTakingInput = false;
                 break;
             case keyCode::Backspace:
-                inputBuffer.pop_back();
-                app.updateUI();
+                if (!inputBuffer.empty()) {
+                    inputBuffer.pop_back();
+                    app.updateUI();
+                }
                 break;
             case keyCode::Esc: // cancel
                 Cursor::hide();

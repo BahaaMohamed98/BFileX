@@ -67,8 +67,8 @@ class InputHandler {
     void handleQuit() const;
 
     [[nodiscard]] static Action getAction(char input);
-    [[nodiscard]] bool confirmAction(const std::string& prompt, const Color::Code& color = Color::Red) const;
-    bool readInputString(const std::string& prompt, std::string& inputBuffer, EntryType entryType) const;
+    [[nodiscard]] bool confirmAction(std::string_view, const Color::Code& color = Color::Red) const;
+    bool readInputString(std::string_view prompt, std::string& inputBuffer, EntryType entryType) const;
 
 public:
     InputHandler& operator=(const InputHandler&) = delete;
