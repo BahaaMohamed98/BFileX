@@ -67,28 +67,56 @@ void UI::renderTopBar(const std::string& currentPath) const {
         Printer().println(topBar.substr(lastSlashIndex + 1));
 }
 
-void UI::renderEntries(const std::vector<fs::directory_entry>& entries, const size_t currentIndex) {
+void UI::renderEntries(const std::vector<fs::directory_entry>& entries, const size_t currentIndex, const int startX,
+                       const int startY) {
     const size_t totalEntries = entries.size();
     const size_t maxVisibleEntries = terminalHeight - 2; // display height for the entries
 
     // return if there's nothing to render
-    if (maxVisibleEntries < 1)
+    if (maxVisibleEntries < 1) {
         return;
+    }
 
     // Update the starting index for scrolling
-    if (currentIndex >= startingIndex + maxVisibleEntries)
+    if (currentIndex >= startingIndex + maxVisibleEntries) {
         // if current index more than starting index: make current index the last displayed element
         startingIndex = currentIndex - maxVisibleEntries + 1;
-    else if (currentIndex < startingIndex)
+    } else if (currentIndex < startingIndex) {
         // if current index less than starting index: start from the current index
         startingIndex = currentIndex;
+    }
 
     // calculate end index for display
     const size_t endIndex = std::min(startingIndex + maxVisibleEntries, totalEntries);
 
+    // Tracks the row-wise offset for rendering
+    int verticalOffset{};
+
     // Render visible entries
     for (size_t i = startingIndex; i < endIndex; ++i) {
+        Cursor::moveTo(startX, startY + verticalOffset++);
         printEntry(entries[i], i == currentIndex);
+    }
+}
+
+void UI::renderPreview(const fs::directory_entry& entry) {
+    // return if it's a binary file
+    if (FileProperties::Utilities::isBinary(entry.path().string())) {
+        return;
+    }
+
+    const EntryType entryType = FileProperties::Types::determineEntryType(entry);
+
+    if (entryType == EntryType::RegularFile) {
+        const std::string filePath = FileProperties::MetaData::getName(entry).string();
+
+        // renders the preview for selected file
+        filePreview.render(filePath);
+    } else if (entryType == EntryType::Directory and !FileProperties::Utilities::isDotDot(entry)) {
+        App& app = App::getInstance();
+
+        // render preview for the children of the current entry
+        renderEntries(app.getCurrentEntryChildren(), app.getCachedIndex(entry.path()), terminalWidth / 2 + 1, 3);
     }
 }
 
@@ -130,17 +158,12 @@ void UI::renderFooter(App& app) const {
 
     // show the current entry index and total entries in the directory
     const std::string directoryNumber =
-            " " + std::to_string(app.getEntryIndex() + 1) +
+            " " + std::to_string(app.getCurrentEntryIndex() + 1) +
             "/" + std::to_string(static_cast<int>(app.getEntries().size()));
 
     // move to the end of the row to print the directory index information
     Cursor::moveTo(terminalWidth - static_cast<int>(directoryNumber.length()) + 1, terminalHeight);
     Printer().print(directoryNumber);
-}
-
-void UI::renderPreview(const std::string& filePath) {
-    // renders the preview for the given file path
-    preview.render(filePath);
 }
 
 void UI::resize(const int nWidth, const int nHeight) {
@@ -150,5 +173,5 @@ void UI::resize(const int nWidth, const int nHeight) {
     highlightWidth = terminalWidth / 2;
 
     // resizeing the preview with the new dimensions
-    preview.resize(terminalWidth, terminalHeight);
+    filePreview.resize(terminalWidth, terminalHeight);
 }

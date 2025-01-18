@@ -2,7 +2,7 @@
 
 #include "Terminal++.hpp"
 
-class Preview {
+class FilePreview {
     // terminal dimensions
     int terminalWidth{};
     int terminalHeight{};
@@ -35,7 +35,7 @@ class Preview {
     void printBorderLine(const std::string& leftCorner, const std::string& rightCorner, int length) const;
 
 public:
-    Preview();                                        // todo: refactor to take width and height
-    void resize(int width, int height); // resize the preview
-    void render(const std::string& filePath);         // render the preview of the given file
+    FilePreview();                            // todo: refactor to take width and height
+    void resize(int width, int height);       // resizes the preview
+    void render(const std::string& filePath); // renders the preview of the given file
 };

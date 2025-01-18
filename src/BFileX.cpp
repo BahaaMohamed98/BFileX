@@ -29,17 +29,13 @@ void BFileX::renderUI() {
     Screen::clear();
 
     ui.renderTopBar((fs::current_path() / app.getCurrentEntry()).string());
-    ui.renderEntries(app.getEntries(), app.getEntryIndex());
 
     // show preview if enabled
-    if (app.shouldShowPreview() and
-        FileProperties::Types::determineEntryType(app.getCurrentEntry()) == EntryType::RegularFile and
-        !FileProperties::Utilities::isBinary(app.getCurrentEntry().path().string())
-        // only show preview if it's normal text file
-    ) {
-        ui.renderPreview(FileProperties::MetaData::getName(app.getCurrentEntry()).string());
+    if (app.shouldShowPreview()) {
+        ui.renderPreview(app.getCurrentEntry());
     }
 
+    ui.renderEntries(app.getEntries(), app.getCurrentEntryIndex(), 1, 2);
     ui.renderFooter(app);
 
     Printer::flush();

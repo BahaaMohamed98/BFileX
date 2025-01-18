@@ -14,14 +14,14 @@ add_executable(BFileX src/main.cpp
         src/include/FileProperties.hpp
         src/include/InputHandler.hpp
         src/include/UI.hpp
-        src/include/Preview.hpp
+        src/include/FilePreview.hpp
         src/App.cpp
         src/BFileX.cpp
         src/FileManager.cpp
         src/FileProperties.cpp
         src/InputHandler.cpp
         src/UI.cpp
-        src/Preview.cpp
+        src/FilePreview.cpp
         src/CommandLineParser.cpp
         src/include/CommandLineParser.hpp
 )

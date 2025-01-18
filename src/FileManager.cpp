@@ -56,8 +56,9 @@ void FileManager::setEntries(
 
     for (const auto& item : fs::directory_iterator(rootPath)) {
         // only add the item if it's not hidden or hidden files are allowed
-        if (showHidden or !FileProperties::Utilities::isHidden(item))
+        if (showHidden or !FileProperties::Utilities::isHidden(item)) {
             entries.push_back(item);
+        }
     }
 
     // if there exists a search query

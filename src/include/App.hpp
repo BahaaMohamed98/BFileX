@@ -37,16 +37,21 @@ public:
 
     [[nodiscard]] bool isRunning() const;
     void quit();
-    [[nodiscard]] size_t getEntryIndex() const;
-    void setEntryIndex(size_t index);
-    void incrementEntryIndex();
-    void decrementEntryIndex();
+
+    [[nodiscard]] size_t getCachedIndex(const fs::path& entry) const;
+    [[nodiscard]] std::vector<fs::directory_entry> getCurrentEntryChildren();
+    [[nodiscard]] size_t getCurrentEntryIndex() const;
+
+    void setCurrentEntryIndex(size_t index);
+    void incrementCurrentEntryIndex();
+    void decrementCurrentEntryIndex();
 
     fs::directory_entry& getCurrentEntry();
     std::vector<fs::directory_entry>& getEntries();
 
     void changeDirectory(const fs::path& path);
-    void updateEntries();
+    void updateEntries(bool updateUI_);
+    void setEntries(std::vector<fs::directory_entry>& entries, const fs::path& path) const;
     void sortEntries();
 
     void setShowHiddenEntries(bool showHiddenFiles);
@@ -60,9 +65,9 @@ public:
 
     void setSearchQuery(const std::string& searchQuery);
     void resetSearchQuery();
-    std::string getSearchQuery() const;
+    const std::string& getSearchQuery() const;
 
-    void setCustomFooter(const std::function<void()>& customFooter);
+    void setCustomFooter(const std::function<void()>& customFooter, bool updateUI_);
     void resetFooter();
     const std::function<void()>& getCustomFooter() const;
 

@@ -1,7 +1,7 @@
-#include "Preview.hpp"
+#include "FilePreview.hpp"
 #include <fstream>
 
-void Preview::readFile(const std::string& path) {
+void FilePreview::readFile(const std::string& path) {
     lines.clear(); // clear previous file
 
     std::ifstream file(path);
@@ -22,7 +22,8 @@ void Preview::readFile(const std::string& path) {
     }
 }
 
-void Preview::printBorderLine(const std::string& leftCorner, const std::string& rightCorner, const int length) const {
+void FilePreview::printBorderLine(const std::string& leftCorner, const std::string& rightCorner,
+                                  const int length) const {
     Printer printer;
 
     // left corner
@@ -36,12 +37,12 @@ void Preview::printBorderLine(const std::string& leftCorner, const std::string& 
     printer.println(rightCorner);
 }
 
-Preview::Preview() {
+FilePreview::FilePreview() {
     auto [width,height] = Terminal::size();
     resize(width, height);
 }
 
-void Preview::resize(const int width, const int height) { // todo: change to a simpler way
+void FilePreview::resize(const int width, const int height) { // todo: change to a simpler way
     terminalWidth = width, terminalHeight = height;
 
     // calculate starting position for the preview box
@@ -53,7 +54,7 @@ void Preview::resize(const int width, const int height) { // todo: change to a s
     maxLineWidth = (terminalWidth - leftStartingPosition) - 3;
 }
 
-void Preview::render(const std::string& filePath) {
+void FilePreview::render(const std::string& filePath) {
     const int contentLength = terminalWidth - leftStartingPosition - 1;
 
     // read the file content into the `lines` vector

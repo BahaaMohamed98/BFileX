@@ -1,11 +1,12 @@
 #include "App.hpp"
+#include "FileProperties.hpp"
 #include "Terminal++.hpp"
 
 App::App()
     : isRunning_(true), entryIndex(0), reverseEntries(false), showHiddenEntries(false),
       showPreview(true), sortType(SortType::Normal), customFooter(nullptr),
       uiUpdated(true), entriesUpdated(true) {
-    updateEntries();
+    updateEntries(false);
 }
 
 App& App::getInstance() {
@@ -21,44 +22,68 @@ void App::quit() {
     this->isRunning_.store(false);
 }
 
-void App::setEntryIndex(const size_t index) {
+size_t App::getCachedIndex(const fs::path& entry) const {
+    if (const auto it = entriesIndices.find(entry); it != entriesIndices.end()) {
+        return it->second;
+    }
+    return 0;
+}
+
+std::vector<fs::directory_entry> App::getCurrentEntryChildren() {
+    if (getCurrentEntry().is_directory()) {
+        std::vector<fs::directory_entry> children;
+        setEntries(children, getCurrentEntry().path());
+        return children;
+    }
+
+    return {};
+}
+
+void App::setCurrentEntryIndex(const size_t index) {
     entryIndex.store(index);
     updateUI();
 }
 
-[[nodiscard]] size_t App::getEntryIndex() const {
+[[nodiscard]] size_t App::getCurrentEntryIndex() const {
     return entryIndex.load();
 }
 
-void App::incrementEntryIndex() {
-    setEntryIndex((getEntryIndex() + 1) % static_cast<int>(entries.size()));
+void App::incrementCurrentEntryIndex() {
+    setCurrentEntryIndex((getCurrentEntryIndex() + 1) % static_cast<int>(entries.size()));
 }
 
-void App::decrementEntryIndex() {
-    if (getEntryIndex() == 0) {
-        setEntryIndex(static_cast<int>(entries.size()) - 1);
+void App::decrementCurrentEntryIndex() {
+    if (getCurrentEntryIndex() == 0) {
+        setCurrentEntryIndex(static_cast<int>(entries.size()) - 1);
     } else {
-        setEntryIndex(getEntryIndex() - 1);
+        setCurrentEntryIndex(getCurrentEntryIndex() - 1);
     }
 }
 
 fs::directory_entry& App::getCurrentEntry() {
-    return entries[getEntryIndex()];
+    return entries[getCurrentEntryIndex()];
 }
 
-void App::updateEntries() {
+void App::updateEntries(const bool updateUI_) {
+    setEntries(getEntries(), fs::current_path());
+
+    // update the index to be the min between the previous index and the largest index
+    setCurrentEntryIndex(std::min(getCurrentEntryIndex(), getEntries().size() - 1));
+
+    if (updateUI_) {
+        updateUI();
+    }
+}
+
+void App::setEntries(std::vector<fs::directory_entry>& entries, const fs::path& path) const {
     FileManager::setEntries(
-        fs::current_path(),
-        getEntries(),
+        path,
+        entries,
         getSearchQuery(),
         shouldShowHiddenEntries(),
         getSortType(),
         shouldReverseEntries()
     );
-
-    // update the index to be the min between the previous index and the largest index
-    setEntryIndex(std::min(getEntryIndex(), getEntries().size() - 1));
-    updateUI();
 }
 
 void App::sortEntries() {
@@ -103,25 +128,27 @@ void App::setSortType(const SortType sortType) {
 
 void App::setSearchQuery(const std::string& searchQuery) {
     this->searchQuery = searchQuery;
-    updateEntries();
+    updateEntries(true);
 }
 
 void App::resetSearchQuery() {
     searchQuery.clear();
-    updateEntries();
+    updateEntries(false); // get the new entries
 }
 
-std::string App::getSearchQuery() const {
+const std::string& App::getSearchQuery() const {
     return searchQuery;
 }
 
-void App::setCustomFooter(const std::function<void()>& customFooter) {
+void App::setCustomFooter(const std::function<void()>& customFooter, const bool updateUI_) {
     this->customFooter = customFooter;
-    updateUI();
+    if (updateUI_) {
+        updateUI();
+    }
 }
 
 void App::resetFooter() {
-    setCustomFooter(nullptr);
+    setCustomFooter(nullptr, true);
 }
 
 const std::function<void()>& App::getCustomFooter() const {
@@ -133,26 +160,21 @@ void App::changeDirectory(const fs::path& path) {
     const fs::path previousParent = fs::current_path();
 
     // Save the index of the current path for the future
-    entriesIndices[fs::current_path()] = getEntryIndex();
+    entriesIndices[fs::current_path()] = getCurrentEntryIndex();
 
     fs::current_path(path); // change directory
     resetSearchQuery();     // reset search query after changing directory
-    updateEntries();        // get the new entries
 
-    // if entry visited before get it's stored index
-    if (const auto it = entriesIndices.find(fs::current_path()); it != entriesIndices.end()) {
-        setEntryIndex(it->second);
-    } else if (path.filename() == fs::path("..") and fs::current_path().has_parent_path()) {
+    if (FileProperties::Utilities::isDotDot(path) and fs::current_path().has_parent_path()) {
         // when going back highlight the parent of the current directory
 
         // we search for the previous' parent index in the current directory
         // and set the current entry index to its index
-        setEntryIndex(FileManager::getIndex(previousParent, entries));
+        setCurrentEntryIndex(FileManager::getIndex(previousParent, entries));
     } else {
-        setEntryIndex(0); // if not visited start at the begining
+        // if entry visited before get it's stored index
+        setCurrentEntryIndex(getCachedIndex(path));
     }
-
-    updateUI(); // updaing the ui after changing the entries
 }
 
 bool App::shouldUpdateUI() {
@@ -182,6 +204,6 @@ void App::setStartingEntry(const fs::path& path) {
     } catch (const fs::filesystem_error&) {
         setCustomFooter([=] {
             Printer(Color::Red).print("Invalid directory path: ", path);
-        });
+        }, false);
     }
 }

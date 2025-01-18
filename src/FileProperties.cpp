@@ -182,6 +182,10 @@ bool FileProperties::Utilities::isBinary(const std::string& path) {
     );
 }
 
+bool FileProperties::Utilities::isDotDot(const std::filesystem::path& path) {
+    return path.filename() == fs::path("..");
+}
+
 // Custom hash function for Icon
 std::size_t std::hash<FileProperties::Icon>::operator()(const FileProperties::Icon& icon) const noexcept {
     return std::hash<std::string>()(icon.representation);

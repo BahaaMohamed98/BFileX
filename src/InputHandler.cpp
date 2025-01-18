@@ -5,11 +5,11 @@ InputHandler::InputHandler()
     : app(App::getInstance()) {}
 
 void InputHandler::handleUp() const {
-    app.decrementEntryIndex();
+    app.decrementCurrentEntryIndex();
 }
 
 void InputHandler::handleDown() const {
-    app.incrementEntryIndex();
+    app.incrementCurrentEntryIndex();
 }
 
 void InputHandler::handleEnter() const {
@@ -63,21 +63,21 @@ void InputHandler::handleRename() const {
         // rename the entry to the specified name
         fs::rename(oldEntry.path(), newPath);
 
-        // refresh the entries stored
-        app.updateEntries();
-
-        // set the cursor to point at the same entry after renaming
-        app.setEntryIndex(FileManager::getIndex(newPath, app.getEntries()));
-
         app.setCustomFooter([=] {
             Printer(Color::Green)
                     .setTextStyle(TextStyle::Bold)
                     .print("Renamed ", FileProperties::MetaData::getName(oldEntry), " to: ", newPath.filename());
-        });
+        }, false);
+
+        // refresh the entries stored
+        app.updateEntries(false);
+
+        // set the cursor to point at the same entry after renaming
+        app.setCurrentEntryIndex(FileManager::getIndex(newPath, app.getEntries()));
     } catch (const fs::filesystem_error&) {
         app.setCustomFooter([] {
             Printer(Color::Red).setTextStyle(TextStyle::Bold).print("Failed to rename entry!");
-        });
+        }, true);
     }
 }
 
@@ -99,8 +99,9 @@ void InputHandler::handleDelete() const {
         if (FileProperties::Types::determineEntryType(app.getCurrentEntry()) == EntryType::Directory and
             !is_empty(app.getCurrentEntry())) {
             // return if the answer is not yes
-            if (!confirmAction("Directory is not empty, delete it recursively? (y/n) "))
+            if (!confirmAction("Directory is not empty, delete it recursively? (y/n) ")) {
                 return app.resetFooter();
+            }
 
             const auto deletedEntriess = fs::remove_all(app.getCurrentEntry().path());
 
@@ -113,20 +114,20 @@ void InputHandler::handleDelete() const {
                 if (deletedEntriess > 1) {
                     printer.print(" and ", deletedEntriess - 1, " other ", (deletedEntriess > 2 ? "entries" : "entry"));
                 }
-            });
+            }, false);
         } else {
             fs::remove(app.getCurrentEntry().path());
             app.setCustomFooter([=] {
                 Printer(Color::Green).setTextStyle(TextStyle::Bold).print("Deleted entry: ", targetEntry);
-            });
+            }, false);
         }
 
         // refresh entries
-        app.updateEntries();
+        app.updateEntries(true);
     } catch (const fs::filesystem_error&) {
         app.setCustomFooter([] {
             Printer(Color::Red).setTextStyle(TextStyle::Bold).print("Failed to delete entry!");
-        });
+        }, true);
     }
 }
 
@@ -180,7 +181,7 @@ void InputHandler::handleMakeDirectory() const {
         if (fs::exists(inputBuffer)) {
             app.setCustomFooter([] {
                 Printer(Color::Red).setTextStyle(TextStyle::Bold).print("File already exists!");
-            });
+            }, true);
             return;
         }
 
@@ -192,15 +193,15 @@ void InputHandler::handleMakeDirectory() const {
     if (directoryCreated) {
         app.setCustomFooter([=] {
             Printer(Color::Green).setTextStyle(TextStyle::Bold).print("Created directory: ", inputBuffer);
-        });
+        }, false);
 
-        app.updateEntries();
+        app.updateEntries(false);
         // place cursor on the newly created directory
-        app.setEntryIndex(FileManager::getIndex(fs::current_path() / fs::path(inputBuffer), app.getEntries()));
+        app.setCurrentEntryIndex(FileManager::getIndex(fs::current_path() / fs::path(inputBuffer), app.getEntries()));
     } else {
         app.setCustomFooter([] {
             Printer(Color::Red).setTextStyle(TextStyle::Bold).print("Failed to create directory!");
-        });
+        }, true);
     }
 }
 
@@ -214,31 +215,31 @@ void InputHandler::handleCreateFile() const {
     if (fs::exists(inputBuffer)) {
         app.setCustomFooter([] {
             Printer(Color::Red).setTextStyle(TextStyle::Bold).print("File already exists!");
-        });
+        }, true);
         return;
     }
 
     if (std::ofstream(inputBuffer).is_open()) {
         app.setCustomFooter([=] {
             Printer(Color::Green).setTextStyle(TextStyle::Bold).print("Created file: ", inputBuffer);
-        });
+        }, false);
 
-        app.updateEntries();
+        app.updateEntries(false);
 
         const int fileIndex = FileManager::getIndex(fs::current_path() / fs::path(inputBuffer), app.getEntries());
 
         // place cursor on the newly created file
-        app.setEntryIndex(fileIndex);
+        app.setCurrentEntryIndex(fileIndex);
     } else {
         app.setCustomFooter([] {
             Printer(Color::Red).setTextStyle(TextStyle::Bold).print("Failed to create file!");
-        });
+        }, true);
     }
 }
 
 void InputHandler::handleToggleHideEntries() const {
     app.setShowHiddenEntries(!app.shouldShowHiddenEntries());
-    app.updateEntries();
+    app.updateEntries(true);
 }
 
 void InputHandler::handleQuit() const {
@@ -256,7 +257,7 @@ bool InputHandler::confirmAction(const std::string_view prompt, const Color::Cod
 
     app.setCustomFooter([&] {
         Printer(color).setTextStyle(TextStyle::Bold).print(prompt);
-    });
+    }, true);
 
     const char answer = Input::getChar();
     Cursor::hide();
@@ -274,7 +275,7 @@ bool InputHandler::readInputString(const std::string_view prompt, std::string& i
     app.setCustomFooter([&] {
         Printer(FileProperties::Mapper::getColor(entryType))
                 .print(prompt, inputBuffer);
-    });
+    }, true);
 
     bool isTakingInput = true;
     while (isTakingInput) {

@@ -107,6 +107,7 @@ public:
         static bool isHidden(const std::filesystem::directory_entry& entry);
         static bool isExecutable(const std::filesystem::path& path);
         static bool isBinary(const std::string& path);
+        static bool isDotDot(const std::filesystem::path& path);
     };
 };
 
