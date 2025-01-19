@@ -90,7 +90,7 @@ void InputHandler::handleDelete() const {
     }
 
     // return if the answer is not yes
-    if (!confirmAction("Are you sure you want to delete \"" + std::string{targetEntry} + "\"? (y/n) ")) {
+    if (!confirmAction("Are you sure you want to delete \"" + targetEntry.string() + "\"? (y/n) ")) {
         return app.resetFooter();
     }
 

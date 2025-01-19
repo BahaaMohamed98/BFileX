@@ -43,7 +43,7 @@ std::string FileProperties::MetaData::getPermissionsAsString(const fs::directory
         std::string ret;
         const auto permissions = fs::status(entry.path()).permissions();
 
-        auto appendPermission = [&](const std::string& ch, const fs::perms& permission) {
+        auto appendPermission = [&](const std::string_view ch, const fs::perms& permission) {
             ret.append(
                 (permissions & permission) == fs::perms::none ? "-" : ch
             );

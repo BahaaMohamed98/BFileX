@@ -5,18 +5,16 @@ class CommandLineParser {
     class CommandLinePrinter {
         static constexpr int indentWidth = 10; // Alignment width for printed commands
 
-        static void printCommand(const std::string& command, const std::string& description,
-                                 bool trailingNewLine = true);
+        static void printCommand(std::string_view command, std::string_view description, bool trailingNewLine = true);
 
     public:
         static void printUsage();
         static void printHelp();
-        static void printErrorUnknownCommand(const std::string& command); // Print error for unrecognized commands
-        static void printErrorMultipleEntries(); // Print error for unrecognized commands
+        static void printErrorUnknownCommand(std::string_view command); // Print error for unrecognized commands
+        static void printErrorMultipleEntries();                        // Print error for unrecognized commands
     };
 
-private:
-    static inline std::unordered_map<std::string, Action> commandToAction{
+    static inline std::unordered_map<std::string_view, Action> commandToAction{
         {"-t", Action::ToggleSortByTime},
         {"--time", Action::ToggleSortByTime},
 
@@ -36,7 +34,8 @@ private:
         {"--help", Action::ToggleHelp},
     };
 
-    static Action getAction(const std::string& argument);
+    static Action getAction(std::string_view argument);
+
 public:
     static void parse(int argc, char** argv);
 };

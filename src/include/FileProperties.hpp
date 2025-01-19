@@ -35,7 +35,7 @@ public:
     };
 
     class Types {
-        static inline std::unordered_map<std::string, FileType> extensionType{
+        static inline std::unordered_map<std::string_view, FileType> extensionType{
             {".txt", FileType::Text},
             {".cpp", FileType::Cpp},
             {".h", FileType::Header},

@@ -24,7 +24,8 @@ void CommandLineParser::CommandLinePrinter::printHelp() {
     printCommand("-h, --help", "Show help screen", false);
 }
 
-void CommandLineParser::CommandLinePrinter::printCommand(const std::string& command, const std::string& description,
+void CommandLineParser::CommandLinePrinter::printCommand(const std::string_view command,
+                                                         const std::string_view description,
                                                          const bool trailingNewLine) {
     Printer printer;
     printer.setTextColor(Color::Cyan).println(std::setw(indentWidth), command)
@@ -34,7 +35,7 @@ void CommandLineParser::CommandLinePrinter::printCommand(const std::string& comm
         printer.println();
 }
 
-void CommandLineParser::CommandLinePrinter::printErrorUnknownCommand(const std::string& command) {
+void CommandLineParser::CommandLinePrinter::printErrorUnknownCommand(const std::string_view command) {
     Printer(Color::Red).print("Error: ");
     Printer().print("Unknown command: \"")
             .setTextColor(Color::Cyan).print(command).resetColors().println("\"\n");
@@ -46,7 +47,7 @@ void CommandLineParser::CommandLinePrinter::printErrorMultipleEntries() {
     Printer(Color::Red).println("Error: only one entry allowed");
 }
 
-Action CommandLineParser::getAction(const std::string& argument) {
+Action CommandLineParser::getAction(const std::string_view argument) {
     // if the argument doesn't start with a dash it should be a path
     if (argument.front() != '-') {
         return Action::SetStartingDirectory;
@@ -69,7 +70,7 @@ void CommandLineParser::parse(const int argc, char** argv) {
 
     // starting at index 1 to get rid of the program name
     for (int i = 1; i < argc; ++i) {
-        switch (const std::string argument{argv[i]}; getAction(argument)) {
+        switch (const std::string_view argument{argv[i]}; getAction(argument)) {
             case Action::ToggleSortByTime:
                 app.setSortType(SortType::Time);
                 break;
