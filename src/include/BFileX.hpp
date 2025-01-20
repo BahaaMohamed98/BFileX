@@ -1,19 +1,15 @@
 #pragma once
 
-#include "InputHandler.hpp"
+#include "App.hpp"
 #include "UI.hpp"
 
 class BFileX {
-    UI ui;
-    App& app;
-    Terminal terminal;
+    static UI& ui;
+    static App& app;
 
-    static void signalHandler(int signal);
-    [[nodiscard]] bool terminalResized();
-    void renderUI();
-
-    void startMainLoop();
-    BFileX();
+    static void signalHandler(int);
+    static void handleResize(int);
+    static void renderUI();
 
 public:
     static void run(int argc, char** argv);

@@ -20,9 +20,10 @@ class UI {
     // print a single directory entry with optional highlighting
     void printEntry(const std::filesystem::directory_entry& entry, bool highlight = false) const;
 
+    UI(); // initialize the terminal
 public:
-    UI();  // initialize the terminal
-    ~UI(); // restore the terminal to its previous state
+    UI(UI&) = delete; // deleting the copy constructor
+    ~UI();            // restore the terminal to its previous state
 
     // render the top bar with the current path
     void renderTopBar(const std::string& currentPath) const;
@@ -34,4 +35,6 @@ public:
     void renderPreview(const fs::directory_entry& entry);
     // resize the UI for the terminal
     void resize(int nWidth, int nHeight);
+
+    static UI& getInstance();
 };

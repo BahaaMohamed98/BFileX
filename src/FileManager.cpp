@@ -147,11 +147,9 @@ void FileManager::sortEntries(
 
 void FileManager::openFile(const std::string& filePath) {
     std::string command;
-#ifdef _WIN32
-    command = "start \"\"";
-#elif __linux__
+#ifdef __linux__
     command = "xdg-open";
-#elif __APPLE__
+#else
     command = "open";
 #endif
     std::system((command + " \'" + filePath + "\'").c_str());

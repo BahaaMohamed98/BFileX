@@ -306,81 +306,77 @@ bool InputHandler::readInputString(const std::string_view prompt, std::string& i
     return true;
 }
 
-InputHandler& InputHandler::getInstance() {
-    static InputHandler inputHandler;
-    return inputHandler;
+void InputHandler::inputLoop() const {
+    int iterations = 0;
+
+    while (app.isRunning()) {
+        switch (getAction(Input::getChar())) {
+            case Action::Up:
+                handleUp();
+                break;
+            case Action::Down:
+                handleDown();
+                break;
+            case Action::Enter:
+                handleEnter();
+                break;
+            case Action::Back:
+                handleBack();
+                break;
+            case Action::Rename:
+                handleRename();
+                iterations = 0;
+                break;
+            case Action::Delete:
+                handleDelete();
+                iterations = 0;
+                break;
+            case Action::MakeDirectory:
+                handleMakeDirectory();
+                iterations = 0;
+                break;
+            case Action::CreateFile:
+                handleCreateFile();
+                iterations = 0;
+                break;
+            case Action::ToggleSortByTime:
+                handleToggleSortByTime();
+                break;
+            case Action::ToggleSortBySize:
+                handleToggleSortBySize();
+                break;
+            case Action::ToggleReverseEntries:
+                handleToggleReverseEntries();
+                break;
+            case Action::ToggleHideEntries:
+                handleToggleHideEntries();
+                break;
+            case Action::TogglePreview:
+                handleTogglePreview();
+                break;
+            case Action::ToggleSearch:
+                handleToggleSearch();
+                break;
+            case Action::Quit:
+                handleQuit();
+                break;
+            case Action::ESC:
+                app.resetSearchQuery();
+                break;
+            default:
+                break;
+        }
+
+        // reset footer after taking input
+        if (++iterations >= 2) {
+            app.resetFooter();
+            app.updateUI();
+            iterations = 0;
+        }
+    }
 }
 
 void InputHandler::handleInput() {
-    terminal.nonBlock(
-        [&]() {
-            int iterations = 0;
-
-            while (app.isRunning()) {
-                switch (getAction(Input::getChar())) {
-                    case Action::Up:
-                        handleUp();
-                        break;
-                    case Action::Down:
-                        handleDown();
-                        break;
-                    case Action::Enter:
-                        handleEnter();
-                        break;
-                    case Action::Back:
-                        handleBack();
-                        break;
-                    case Action::Rename:
-                        handleRename();
-                        iterations = 0;
-                        break;
-                    case Action::Delete:
-                        handleDelete();
-                        iterations = 0;
-                        break;
-                    case Action::MakeDirectory:
-                        handleMakeDirectory();
-                        iterations = 0;
-                        break;
-                    case Action::CreateFile:
-                        handleCreateFile();
-                        iterations = 0;
-                        break;
-                    case Action::ToggleSortByTime:
-                        handleToggleSortByTime();
-                        break;
-                    case Action::ToggleSortBySize:
-                        handleToggleSortBySize();
-                        break;
-                    case Action::ToggleReverseEntries:
-                        handleToggleReverseEntries();
-                        break;
-                    case Action::ToggleHideEntries:
-                        handleToggleHideEntries();
-                        break;
-                    case Action::TogglePreview:
-                        handleTogglePreview();
-                        break;
-                    case Action::ToggleSearch:
-                        handleToggleSearch();
-                        break;
-                    case Action::Quit:
-                        handleQuit();
-                        break;
-                    case Action::ESC:
-                        app.resetSearchQuery();
-                        break;
-                    default:
-                        break;
-                }
-
-                // reset footer after taking input
-                if (++iterations >= 2) {
-                    app.resetFooter();
-                    app.updateUI();
-                    iterations = 0;
-                }
-            }
-        }
-        , true);
+    const InputHandler inputHandler;
+    inputHandler.inputLoop();
 }

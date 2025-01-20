@@ -175,3 +175,8 @@ void UI::resize(const int nWidth, const int nHeight) {
     // resizeing the preview with the new dimensions
     filePreview.resize(terminalWidth, terminalHeight);
 }
+
+UI& UI::getInstance() {
+    static UI ui;
+    return ui;
+}

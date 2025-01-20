@@ -70,10 +70,8 @@ class InputHandler {
     [[nodiscard]] static Action getAction(char input);
     [[nodiscard]] bool confirmAction(std::string_view, const Color::Code& color = Color::Red) const;
     bool readInputString(std::string_view prompt, std::string& inputBuffer, EntryType entryType) const;
+    void inputLoop() const;
 
 public:
-    InputHandler& operator=(const InputHandler&) = delete;
-
-    static InputHandler& getInstance();
-    void handleInput();
+    static void handleInput();
 };

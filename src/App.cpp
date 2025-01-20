@@ -1,11 +1,13 @@
 #include "App.hpp"
+
+#include <atomic>
+
 #include "FileProperties.hpp"
 #include "Terminal++.hpp"
 
 App::App()
     : isRunning_(true), entryIndex(0), reverseEntries(false), showHiddenEntries(false),
-      showPreview(true), sortType(SortType::Normal), customFooter(nullptr),
-      uiUpdated(true), entriesUpdated(true) {
+      showPreview(true), sortType(SortType::Normal), customFooter(nullptr), uiUpdateCallBack(nullptr) {
     updateEntries(false);
 }
 
@@ -15,11 +17,11 @@ App& App::getInstance() {
 }
 
 [[nodiscard]] bool App::isRunning() const {
-    return isRunning_.load();
+    return isRunning_;
 }
 
 void App::quit() {
-    this->isRunning_.store(false);
+    isRunning_ = false;
 }
 
 size_t App::getCachedIndex(const fs::path& entry) const {
@@ -40,12 +42,12 @@ std::vector<fs::directory_entry> App::getCurrentEntryChildren() {
 }
 
 void App::setCurrentEntryIndex(const size_t index) {
-    entryIndex.store(index);
+    entryIndex = index;
     updateUI();
 }
 
 [[nodiscard]] size_t App::getCurrentEntryIndex() const {
-    return entryIndex.load();
+    return entryIndex;
 }
 
 void App::incrementCurrentEntryIndex() {
@@ -177,25 +179,28 @@ void App::changeDirectory(const fs::path& path) {
     }
 }
 
-bool App::shouldUpdateUI() {
-    if (uiUpdated) {
-        uiUpdated = false;
-        return true;
+void App::updateUI() const {
+    static std::atomic_bool updatingUI{false};
+
+    if (not updatingUI.exchange(true)) {
+        if (uiUpdateCallBack != nullptr) {
+            uiUpdateCallBack();
+        }
+        updatingUI.store(false);
     }
-    return false;
 }
 
-void App::updateUI() {
-    uiUpdated = true;
+void App::setUiUpdateCallBack(std::function<void()> function) {
+    uiUpdateCallBack = std::move(function);
 }
 
 void App::setShowPreview(const bool showPreview) {
-    this->showPreview.store(showPreview);
+    this->showPreview = showPreview;
     updateUI();
 }
 
 bool App::shouldShowPreview() const {
-    return showPreview.load();
+    return showPreview;
 }
 
 void App::setStartingEntry(const fs::path& path) {

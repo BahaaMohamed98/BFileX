@@ -1,6 +1,5 @@
 #pragma once
 
-#include <atomic>
 #include <filesystem>
 #include <functional>
 #include <unordered_map>
@@ -10,22 +9,20 @@ namespace fs = std::filesystem;
 
 class App {
     std::vector<fs::directory_entry> entries;
-    std::atomic<bool> isRunning_;
+    bool isRunning_;
 
-    std::atomic<size_t> entryIndex;
+    size_t entryIndex;
     std::unordered_map<fs::path, size_t> entriesIndices;
 
     bool reverseEntries;
     bool showHiddenEntries;
-    std::atomic<bool> showPreview;
+    bool showPreview;
     SortType sortType;
 
     std::string searchQuery;
 
     std::function<void()> customFooter;
-
-    bool uiUpdated;
-    bool entriesUpdated;
+    std::function<void()> uiUpdateCallBack;
 
     fs::path previousParent;
 
@@ -71,8 +68,8 @@ public:
     void resetFooter();
     const std::function<void()>& getCustomFooter() const;
 
-    void updateUI();
-    bool shouldUpdateUI();
+    void updateUI() const;
+    void setUiUpdateCallBack(std::function<void()> function);
 
     void setShowPreview(bool showPreview);
     [[nodiscard]] bool shouldShowPreview() const;

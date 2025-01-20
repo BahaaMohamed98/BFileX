@@ -1,34 +1,36 @@
 #include "BFileX.hpp"
+
+#include <atomic>
 #include <csignal>
+
 #include "App.hpp"
 #include "CommandLineParser.hpp"
-#include "FileProperties.hpp"
 #include "Terminal++.hpp"
+#include "UI.hpp"
 
-BFileX::BFileX()
-    : app(App::getInstance()) {}
-
-void BFileX::signalHandler(const int signal) {
-    App::getInstance().quit();
-
-    Cursor::show();
-    Screen::disableAlternateScreen();
+void BFileX::signalHandler(int) {
+    app.quit();
+    ui.~UI();
 
     exit(EXIT_FAILURE);
 }
 
-bool BFileX::terminalResized() {
-    if (int nWidth, nHeight; terminal.isResized(nWidth, nHeight)) {
-        ui.resize(nWidth, nHeight);
-        return true;
+void BFileX::handleResize(int) {
+    static std::atomic_bool resizing{false};
+
+    if (not resizing.exchange(true)) {
+        auto [width,height] = Terminal::size();
+        ui.resize(width, height);
+        app.updateUI();
+
+        resizing.store(false);
     }
-    return false;
 }
 
 void BFileX::renderUI() {
     Screen::clear();
 
-    ui.renderTopBar((fs::current_path() / app.getCurrentEntry()).string());
+    ui.renderTopBar((fs::current_path() / app.getCurrentEntry().path()).string());
 
     // show preview if enabled
     if (app.shouldShowPreview()) {
@@ -41,21 +43,6 @@ void BFileX::renderUI() {
     Printer::flush();
 }
 
-void BFileX::startMainLoop() {
-    // handling user input
-    InputHandler::getInstance().handleInput();
-
-    while (app.isRunning()) {
-        // a brief delay to lower flickering and cpu usage
-        Terminal::sleep(60);
-
-        // render app only when necessary
-        if (app.shouldUpdateUI() or terminalResized()) {
-            renderUI();
-        }
-    }
-}
-
 void BFileX::run(const int argc, char** argv) {
     // handling command line options
     CommandLineParser::parse(argc, argv);
@@ -63,7 +50,14 @@ void BFileX::run(const int argc, char** argv) {
     // setup signal handling
     signal(SIGINT, signalHandler);
     signal(SIGTERM, signalHandler);
+    signal(SIGWINCH, handleResize);
 
-    BFileX BFileX;
-    BFileX.startMainLoop();
+    app.setUiUpdateCallBack(renderUI);
+    app.updateUI();
+
+    // handling user input
+    InputHandler::handleInput();
 }
+
+UI& BFileX::ui = UI::getInstance();
+App& BFileX::app = App::getInstance();
