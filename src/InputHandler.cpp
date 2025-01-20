@@ -49,14 +49,16 @@ void InputHandler::handleRename() const {
 
         // return if the name was not changed
         if (oldEntry.path() == newPath) {
-            return app.resetFooter();
+            app.resetFooter();
+            return;
         }
 
         // if entry already exists prompt the user about overriding it
         if (fs::exists(newPath)) {
             // return if the answer is not yes
             if (!confirmAction("Entry already exists override it? (y/n) ")) {
-                return app.resetFooter();
+                app.resetFooter();
+                return;
             }
         }
 
@@ -73,7 +75,8 @@ void InputHandler::handleRename() const {
         app.updateEntries(false);
 
         // set the cursor to point at the same entry after renaming
-        app.setCurrentEntryIndex(FileManager::getIndex(newPath, app.getEntries()));
+        const int newIndex = FileManager::getIndex(newPath, app.getEntries());
+        app.setCurrentEntryIndex(newIndex);
     } catch (const fs::filesystem_error&) {
         app.setCustomFooter([] {
             Printer(Color::Red).setTextStyle(TextStyle::Bold).print("Failed to rename entry!");
@@ -91,7 +94,8 @@ void InputHandler::handleDelete() const {
 
     // return if the answer is not yes
     if (!confirmAction("Are you sure you want to delete \"" + targetEntry.string() + "\"? (y/n) ")) {
-        return app.resetFooter();
+        app.resetFooter();
+        return;
     }
 
     try {
@@ -100,7 +104,8 @@ void InputHandler::handleDelete() const {
             !is_empty(app.getCurrentEntry())) {
             // return if the answer is not yes
             if (!confirmAction("Directory is not empty, delete it recursively? (y/n) ")) {
-                return app.resetFooter();
+                app.resetFooter();
+                return;
             }
 
             const auto deletedEntriess = fs::remove_all(app.getCurrentEntry().path());
@@ -143,8 +148,8 @@ void InputHandler::handleToggleSearch() const {
         return;
     }
 
+    app.resetFooter(false);
     app.setSearchQuery(inputBuffer);
-    app.resetFooter();
 }
 
 void InputHandler::handleToggleSortByTime() const {
@@ -196,8 +201,10 @@ void InputHandler::handleMakeDirectory() const {
         }, false);
 
         app.updateEntries(false);
+
         // place cursor on the newly created directory
-        app.setCurrentEntryIndex(FileManager::getIndex(fs::current_path() / fs::path(inputBuffer), app.getEntries()));
+        const int newIndex = FileManager::getIndex(fs::current_path() / fs::path(inputBuffer), app.getEntries());
+        app.setCurrentEntryIndex(newIndex);
     } else {
         app.setCustomFooter([] {
             Printer(Color::Red).setTextStyle(TextStyle::Bold).print("Failed to create directory!");
@@ -226,9 +233,8 @@ void InputHandler::handleCreateFile() const {
 
         app.updateEntries(false);
 
-        const int fileIndex = FileManager::getIndex(fs::current_path() / fs::path(inputBuffer), app.getEntries());
-
         // place cursor on the newly created file
+        const int fileIndex = FileManager::getIndex(fs::current_path() / fs::path(inputBuffer), app.getEntries());
         app.setCurrentEntryIndex(fileIndex);
     } else {
         app.setCustomFooter([] {
@@ -310,6 +316,13 @@ void InputHandler::inputLoop() const {
     int iterations = 0;
 
     while (app.isRunning()) {
+        // reset footer after taking input
+        if (++iterations >= 2) {
+            app.resetFooter(false);
+
+            iterations = 0;
+        }
+
         switch (getAction(Input::getChar())) {
             case Action::Up:
                 handleUp();
@@ -325,19 +338,19 @@ void InputHandler::inputLoop() const {
                 break;
             case Action::Rename:
                 handleRename();
-                iterations = 0;
+                iterations = 1;
                 break;
             case Action::Delete:
                 handleDelete();
-                iterations = 0;
+                iterations = 1;
                 break;
             case Action::MakeDirectory:
                 handleMakeDirectory();
-                iterations = 0;
+                iterations = 1;
                 break;
             case Action::CreateFile:
                 handleCreateFile();
-                iterations = 0;
+                iterations = 1;
                 break;
             case Action::ToggleSortByTime:
                 handleToggleSortByTime();
@@ -362,16 +375,10 @@ void InputHandler::inputLoop() const {
                 break;
             case Action::ESC:
                 app.resetSearchQuery();
+                app.updateEntries(true);
                 break;
             default:
                 break;
-        }
-
-        // reset footer after taking input
-        if (++iterations >= 2) {
-            app.resetFooter();
-            app.updateUI();
-            iterations = 0;
         }
     }
 }

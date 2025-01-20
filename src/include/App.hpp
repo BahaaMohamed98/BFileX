@@ -47,7 +47,7 @@ public:
     std::vector<fs::directory_entry>& getEntries();
 
     void changeDirectory(const fs::path& path);
-    void updateEntries(bool updateUI_);
+    void updateEntries(bool updateIndex);
     void setEntries(std::vector<fs::directory_entry>& entries, const fs::path& path) const;
     void sortEntries();
 
@@ -60,13 +60,13 @@ public:
     void setSortType(SortType sortType);
     [[nodiscard]] SortType getSortType() const;
 
-    void setSearchQuery(const std::string& searchQuery);
+    void setSearchQuery(std::string searchQuery);
     void resetSearchQuery();
     const std::string& getSearchQuery() const;
 
-    void setCustomFooter(const std::function<void()>& customFooter, bool updateUI_);
-    void resetFooter();
+    void setCustomFooter(std::function<void()> customFooter, bool updateUI_);
     const std::function<void()>& getCustomFooter() const;
+    void resetFooter(bool updateUI_ = true);
 
     void updateUI() const;
     void setUiUpdateCallBack(std::function<void()> function);
