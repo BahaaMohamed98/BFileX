@@ -25,8 +25,7 @@ enum class FileType {
     Unknown
 };
 
-class FileProperties {
-public:
+namespace FileProperties {
     struct Icon {
         const std::string representation;
 
@@ -34,7 +33,7 @@ public:
         Icon() = default;
     };
 
-    class Types {
+    namespace Types {
         static inline std::unordered_map<std::string_view, FileType> extensionType{
             {".txt", FileType::Text},
             {".cpp", FileType::Cpp},
@@ -54,12 +53,11 @@ public:
             {".md", FileType::Markdown},
         };
 
-    public:
-        static EntryType determineEntryType(const fs::directory_entry& entry);
-        static FileType determineFileType(const fs::path& filePath);
-    };
+        EntryType determineEntryType(const fs::directory_entry& entry);
+        FileType determineFileType(const fs::path& filePath);
+    }
 
-    class Mapper {
+    namespace Mapper {
         static inline std::unordered_map<EntryType, Color::Code> colorMap{
             {EntryType::Directory, Color::Blue},
             {EntryType::Executable, Color::Red},
@@ -88,28 +86,25 @@ public:
             {FileType::Unknown, Icon(" ")},
         };
 
-    public:
-        static Icon getIcon(const fs::directory_entry& entry);
-        static Color::Code getColor(const fs::directory_entry& entry);
-        static Color::Code getColor(EntryType entryType);
-    };
+        Icon getIcon(const fs::directory_entry& entry);
+        Color::Code getColor(const fs::directory_entry& entry);
+        Color::Code getColor(EntryType entryType);
+    }
 
-    class MetaData {
-    public:
-        static std::string getPermissionsAsString(const fs::directory_entry& entry);
-        static std::string getSizeAsString(const fs::directory_entry& entry);
-        static fs::path getName(const fs::directory_entry& entry);
-        static std::time_t getLastWriteTime(const fs::path& path);
-    };
+    namespace MetaData {
+        std::string getPermissionsAsString(const fs::directory_entry& entry);
+        std::string getSizeAsString(const fs::directory_entry& entry);
+        fs::path getName(const fs::directory_entry& entry);
+        std::time_t getLastWriteTime(const fs::path& path);
+    }
 
-    class Utilities {
-    public:
-        static bool isHidden(const std::filesystem::directory_entry& entry);
-        static bool isExecutable(const std::filesystem::path& path);
-        static bool isBinary(const std::string& path);
-        static bool isDotDot(const std::filesystem::path& path);
-    };
-};
+    namespace Utilities {
+        bool isHidden(const std::filesystem::directory_entry& entry);
+        bool isExecutable(const std::filesystem::path& path);
+        bool isBinary(const std::string& path);
+        bool isDotDot(const std::filesystem::path& path);
+    }
+}
 
 // custom hash function for Icon
 template<>

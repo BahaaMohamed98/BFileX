@@ -122,11 +122,7 @@ std::string FileProperties::MetaData::getSizeAsString(const fs::directory_entry&
 }
 
 bool FileProperties::Utilities::isHidden(const std::filesystem::directory_entry& entry) {
-#ifdef _WIN32 // For Windows
-    return (GetFileAttributesW(entry.path().wstring().c_str()) & FILE_ATTRIBUTE_HIDDEN) != 0;
-#else // For Unix-based systems
     return entry.path().filename().string().front() == '.';
-#endif
 }
 
 bool FileProperties::Utilities::isExecutable(const std::filesystem::path& path) {
@@ -135,28 +131,26 @@ bool FileProperties::Utilities::isExecutable(const std::filesystem::path& path) 
     if (!file.is_open())
         return false; // Return false if the file cannot be opened
 
-    // Check for ELF magic number (Linux executables)
-    std::vector<unsigned char> elfBuffer(4);
-    file.read(reinterpret_cast<char*>(elfBuffer.data()), 4);
+    // Read the first 4 bytes of the file to cover both ELF (4 bytes) and PE (2 bytes)
+    std::vector<unsigned char> buffer(4);
+    file.read(reinterpret_cast<char*>(buffer.data()), 4);
+    const size_t bytesRead = file.gcount();
 
-    if (elfBuffer.size() == 4 &&
-        elfBuffer[0] == 0x7F &&
-        elfBuffer[1] == 'E' &&
-        elfBuffer[2] == 'L' &&
-        elfBuffer[3] == 'F') {
-        return true; // File is an ELF executable
+    if (bytesRead >= 4) {
+        // File is an ELF executable
+        return buffer.size() == 4 and
+               buffer[0] == 0x7F and
+               buffer[1] == 'E' and
+               buffer[2] == 'L' and
+               buffer[3] == 'F';
     }
 
-    // Reset the file position to read for PE magic number (Windows executables)
-    file.clear();  // Clear any error flags
-    file.seekg(0); // Move the file cursor back to the beginning
+    if (bytesRead >= 2) {
+        // File is a PE executable
+        return buffer[0] == 'M' and buffer[1] == 'Z';
+    }
 
-    std::vector<char> peBuffer(2);
-    file.read(peBuffer.data(), 2);
-
-    // Check for PE magic number
-    return peBuffer.size() == 2 &&
-           peBuffer[0] == 'M' && peBuffer[1] == 'Z'; // File is a PE executable
+    return false;
 }
 
 bool FileProperties::Utilities::isBinary(const std::string& path) {
@@ -166,14 +160,14 @@ bool FileProperties::Utilities::isBinary(const std::string& path) {
         return false;
     }
 
-    // limiting the checking to the first 4 KB
-    constexpr size_t bufferSize = 4096;
+    // limiting the checking to the first 1 KB
+    constexpr size_t bufferSize = 1024;
     char buffer[bufferSize];
 
-    // read the first 4kb into the file
+    // read the first 1kb into the file
     file.read(buffer, bufferSize);
 
-    // checking if any of ther chracter read is not normal?
+    // checking if any of ther chracter read is not normal
     return std::any_of(
         buffer, buffer + file.gcount(),
         [](const unsigned char c) {
