@@ -17,11 +17,11 @@ App& App::getInstance() {
 }
 
 [[nodiscard]] bool App::isRunning() const {
-    return isRunning_;
+    return isRunning_.load();
 }
 
 void App::quit() {
-    isRunning_ = false;
+    isRunning_.store(false);
 }
 
 size_t App::getCachedIndex(const fs::path& entry) const {
@@ -131,8 +131,12 @@ void App::setSearchQuery(std::string searchQuery) {
     updateEntries(true);
 }
 
-void App::resetSearchQuery() {
-    searchQuery.clear();
+bool App::resetSearchQuery() {
+    if (not searchQuery.empty()) {
+        searchQuery.clear();
+        return true;
+    }
+    return false;
 }
 
 const std::string& App::getSearchQuery() const {
@@ -156,6 +160,11 @@ const std::function<void()>& App::getCustomFooter() const {
 }
 
 void App::changeDirectory(const fs::path& path) {
+    // return if trying to go back from root directory
+    if (FileProperties::Utilities::isDotDot(path) and fs::current_path() == fs::path("/")) {
+        return;
+    }
+
     // the current path is the previous parent if we go back
     const fs::path previousParent = fs::current_path();
 

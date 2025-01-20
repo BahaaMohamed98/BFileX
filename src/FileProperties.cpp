@@ -128,8 +128,9 @@ bool FileProperties::Utilities::isHidden(const std::filesystem::directory_entry&
 bool FileProperties::Utilities::isExecutable(const std::filesystem::path& path) {
     std::ifstream file(path, std::ios::binary); // Open the file in binary mode
 
-    if (!file.is_open())
+    if (!file.is_open()) {
         return false; // Return false if the file cannot be opened
+    }
 
     // Read the first 4 bytes of the file to cover both ELF (4 bytes) and PE (2 bytes)
     std::vector<unsigned char> buffer(4);
@@ -138,11 +139,12 @@ bool FileProperties::Utilities::isExecutable(const std::filesystem::path& path) 
 
     if (bytesRead >= 4) {
         // File is an ELF executable
-        return buffer.size() == 4 and
-               buffer[0] == 0x7F and
-               buffer[1] == 'E' and
-               buffer[2] == 'L' and
-               buffer[3] == 'F';
+        if (buffer.size() == 4 and
+            buffer[0] == 0x7F and
+            buffer[1] == 'E' and
+            buffer[2] == 'L' and
+            buffer[3] == 'F')
+            return true;;
     }
 
     if (bytesRead >= 2) {

@@ -17,7 +17,8 @@ void InputHandler::handleEnter() const {
         app.changeDirectory(
             fs::current_path() / FileProperties::MetaData::getName(app.getCurrentEntry())
         );
-    } else if (app.getCurrentEntry().is_regular_file()) {
+    } else if (app.getCurrentEntry().is_regular_file() and
+               not FileProperties::Utilities::isExecutable(app.getCurrentEntry().path())) {
         FileManager::openFile(
             (fs::current_path() / app.getCurrentEntry().path()).string()
         );
@@ -374,8 +375,9 @@ void InputHandler::inputLoop() const {
                 handleQuit();
                 break;
             case Action::ESC:
-                app.resetSearchQuery();
-                app.updateEntries(true);
+                if (app.resetSearchQuery()) {
+                    app.updateEntries(true);
+                }
                 break;
             default:
                 break;

@@ -28,7 +28,7 @@ public:
     // render the top bar with the current path
     void renderTopBar(const std::string& currentPath) const;
     // render the entries
-    void renderEntries(const std::vector<fs::directory_entry>& entries, size_t currentIndex, int, int);
+    void renderEntries(const std::vector<fs::directory_entry>& entries, size_t currentIndex, int startX, int startY);
     // render the footer with file details or a custom set footer
     void renderFooter(App& app) const;
     // render file preview

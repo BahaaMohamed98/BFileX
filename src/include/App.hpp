@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <filesystem>
 #include <functional>
 #include <unordered_map>
@@ -9,7 +10,7 @@ namespace fs = std::filesystem;
 
 class App {
     std::vector<fs::directory_entry> entries;
-    bool isRunning_;
+    std::atomic_bool isRunning_;
 
     size_t entryIndex;
     std::unordered_map<fs::path, size_t> entriesIndices;
@@ -61,7 +62,7 @@ public:
     [[nodiscard]] SortType getSortType() const;
 
     void setSearchQuery(std::string searchQuery);
-    void resetSearchQuery();
+    bool resetSearchQuery();
     const std::string& getSearchQuery() const;
 
     void setCustomFooter(std::function<void()> customFooter, bool updateUI_);
