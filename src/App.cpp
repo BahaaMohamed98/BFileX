@@ -42,7 +42,8 @@ std::vector<fs::directory_entry> App::getCurrentEntryChildren() {
 }
 
 void App::setCurrentEntryIndex(const size_t index) {
-    entryIndex = index;
+    // update the index to be the min between the previous index and the largest index
+    entryIndex = std::min(index, getEntries().size() - 1);
     updateUI();
 }
 
@@ -70,8 +71,8 @@ void App::updateEntries(const bool updateIndex) {
     setEntries(getEntries(), fs::current_path());
 
     if (updateIndex) {
-        // update the index to be the min between the previous index and the largest index
-        setCurrentEntryIndex(std::min(getCurrentEntryIndex(), getEntries().size() - 1));
+        // make sure the current index is valid
+        setCurrentEntryIndex(getCurrentEntryIndex());
     }
 }
 

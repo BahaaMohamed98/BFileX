@@ -33,7 +33,7 @@ std::vector<fs::directory_entry> FileManager::searchEntries(const std::string& s
         }
 
         if (name.find(searchQuery) != std::string::npos) {
-            results.push_back(entry);
+            results.emplace_back(entry);
         }
     }
 
