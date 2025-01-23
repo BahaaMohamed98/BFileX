@@ -42,7 +42,7 @@ FilePreview::FilePreview() {
     resize(width, height);
 }
 
-void FilePreview::resize(const int width, const int height) { // todo: change to a simpler way
+void FilePreview::resize(const int width, const int height) {
     terminalWidth = width, terminalHeight = height;
 
     // calculate starting position for the preview box
@@ -88,4 +88,15 @@ void FilePreview::render(const std::string& filePath) {
 
     // bottom border
     printBorderLine(bottomLeftCorner, BottomRightCorner, contentLength);
+}
+
+void FilePreview::clearPreview() const {
+    const int contentLength = terminalWidth - leftStartingPosition + 1;
+    const std::string emptyString(contentLength, ' ');
+
+    Printer printer;
+    for (int i = 0; i < terminalHeight - 2; ++i) {
+        Cursor::moveTo(leftStartingPosition, topStartingPosition + i);
+        printer.print(emptyString);
+    }
 }

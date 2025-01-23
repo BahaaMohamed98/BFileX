@@ -20,6 +20,10 @@ void BFileX::handleResize(int) {
 
     if (not resizing.exchange(true)) {
         auto [width,height] = Terminal::size();
+
+        terminalWidth = width;
+        terminalHeight = height;
+
         ui.resize(width, height);
         app.updateUI();
 
@@ -28,19 +32,48 @@ void BFileX::handleResize(int) {
 }
 
 void BFileX::renderUI() {
-    Screen::clear();
+    // check if a full UI re-render is needed:
+    // - The current entry index was changed
+    // - Terminal was resized
+    // - Entries list was updated
 
-    ui.renderTopBar((fs::current_path() / app.getCurrentEntry().path()).string());
+    if (previousIndex != app.getCurrentEntryIndex() or
+        std::tie(previousWidth, previousHeight) != std::tie(terminalWidth, terminalHeight) or
+        previousEntries != app.getEntries()
+    ) { // full UI re-render
+        Screen::clear();
+        ui.renderTopBar((fs::current_path() / app.getCurrentEntry().path()).string());
 
-    // show preview if enabled
-    if (app.shouldShowPreview()) {
-        ui.renderPreview(app.getCurrentEntry());
+        // render preview if enabled
+        if (app.shouldShowPreview()) {
+            ui.renderPreview(app.getCurrentEntry());
+        }
+
+        // render entries and footer
+        ui.renderEntries(app.getEntries(), app.getCurrentEntryIndex(), 1, 2);
+        ui.renderFooter(app);
+    } else if (previousPreviewOn != app.shouldShowPreview()) {
+        // preview state changed
+        if (app.shouldShowPreview()) {
+            // preview enabled
+            ui.renderPreview(app.getCurrentEntry());
+        } else {
+            // clear preview if it was previously shown but is now disabled
+            ui.clearPreview();
+        }
+    } else {
+        // only update the footer if no major changes occurred
+        ui.renderFooter(app);
     }
 
-    ui.renderEntries(app.getEntries(), app.getCurrentEntryIndex(), 1, 2);
-    ui.renderFooter(app);
-
     Printer::flush();
+
+    // Update previous state for comparison in the next render cycle
+    previousIndex = app.getCurrentEntryIndex();
+    previousPreviewOn = app.shouldShowPreview();
+    previousEntries = app.getEntries();
+    previousWidth = terminalWidth;
+    previousHeight = terminalHeight;
 }
 
 void BFileX::run(const int argc, char** argv) {
@@ -61,3 +94,12 @@ void BFileX::run(const int argc, char** argv) {
 
 UI& BFileX::ui = UI::getInstance();
 App& BFileX::app = App::getInstance();
+
+size_t BFileX::previousIndex{};
+bool BFileX::previousPreviewOn{};
+std::vector<fs::directory_entry> BFileX::previousEntries{};
+
+int BFileX::terminalWidth{};
+int BFileX::terminalHeight{};
+int BFileX::previousWidth{};
+int BFileX::previousHeight{};

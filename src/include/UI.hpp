@@ -33,6 +33,8 @@ public:
     void renderFooter(App& app) const;
     // render file preview
     void renderPreview(const fs::directory_entry& entry);
+    // clear file preview area
+    void clearPreview() const;
     // resize the UI for the terminal
     void resize(int nWidth, int nHeight);
 

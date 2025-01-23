@@ -35,7 +35,8 @@ class FilePreview {
     void printBorderLine(const std::string& leftCorner, const std::string& rightCorner, int length) const;
 
 public:
-    FilePreview();                            // todo: refactor to take width and height
+    FilePreview();
     void resize(int width, int height);       // resizes the preview
     void render(const std::string& filePath); // renders the preview of the given file
+    void clearPreview() const;                // clears the preview area
 };

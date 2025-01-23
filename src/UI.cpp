@@ -70,7 +70,7 @@ void UI::renderTopBar(const std::string& currentPath) const {
 void UI::renderEntries(const std::vector<fs::directory_entry>& entries, const size_t currentIndex, const int startX,
                        const int startY) {
     const size_t totalEntries = entries.size();
-    const size_t maxVisibleEntries = terminalHeight - startY ; // display height for the entries
+    const size_t maxVisibleEntries = terminalHeight - startY; // display height for the entries
 
     // return if there's nothing to render
     if (maxVisibleEntries < 1) {
@@ -120,9 +120,14 @@ void UI::renderPreview(const fs::directory_entry& entry) {
     }
 }
 
+void UI::clearPreview() const {
+    filePreview.clearPreview();
+}
+
 void UI::renderFooter(App& app) const {
     // move to the bottom of the screen to render the footer
     Cursor::moveTo(1, terminalHeight);
+    Screen::clear(ClearType::Line);
 
     // if a custom footer is set run it and return
     if (const auto& footer = app.getCustomFooter(); footer != nullptr)
