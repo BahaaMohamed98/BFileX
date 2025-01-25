@@ -25,14 +25,13 @@ std::vector<fs::directory_entry> FileManager::searchEntries(const std::string& s
     std::vector<fs::directory_entry> results;
 
     for (const auto& entry : entries) {
-        std::string name = entry.path().string();
+        std::string name = entry.path().filename().string();
 
-        if (const auto seperatorIndex = name.find_last_of(fs::path::preferred_separator);
-            seperatorIndex != std::string::npos) {
-            name = name.substr(seperatorIndex);
-        }
+        const bool found = std::search(name.begin(), name.end(), searchQuery.begin(), searchQuery.end(), [] (char a, char b) {
+            return std::tolower(a) == std::tolower(b);
+        }) != name.end();
 
-        if (name.find(searchQuery) != std::string::npos) {
+        if (found) {
             results.emplace_back(entry);
         }
     }

@@ -129,7 +129,11 @@ void App::setSortType(const SortType sortType) {
 
 void App::setSearchQuery(std::string searchQuery) {
     this->searchQuery = std::move(searchQuery);
-    updateEntries(true);
+    updateEntries(false);
+
+    // set the index to first result if there are more than one result
+    // else set it to zero ( the `..` entry)
+    setCurrentEntryIndex(entries.size() > 1 ? 1 : 0);
 }
 
 bool App::resetSearchQuery() {

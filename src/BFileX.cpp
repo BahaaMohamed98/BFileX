@@ -19,7 +19,7 @@ void BFileX::handleResize(int) {
     static std::atomic_bool resizing{false};
 
     if (not resizing.exchange(true)) {
-        auto [width,height] = Terminal::size();
+        auto [width, height] = Terminal::size();
 
         terminalWidth = width;
         terminalHeight = height;

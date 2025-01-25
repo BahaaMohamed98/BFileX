@@ -4,3 +4,7 @@ cmake-build-debug
 build/*
 countLines.zsh
 Bfilex-todo.txt
+out/
+.cache/
+.clang-format
+compile_commands.json
