@@ -2,7 +2,7 @@
 
 #include "App.hpp"
 #include "FileProperties.hpp"
-#include "Terminal++.hpp"
+#include "../include/Terminal++/src/Terminal++.hpp"
 
 enum class Action {
     None,

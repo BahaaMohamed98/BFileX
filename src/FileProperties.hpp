@@ -1,6 +1,6 @@
 #pragma once
 #include <filesystem>
-#include "Terminal++.hpp"
+#include "../include/Terminal++/src/Terminal++.hpp"
 
 namespace fs = std::filesystem;
 

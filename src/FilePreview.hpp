@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Terminal++.hpp"
+#include "../include/Terminal++/src/Terminal++.hpp"
 
 class FilePreview {
     // terminal dimensions

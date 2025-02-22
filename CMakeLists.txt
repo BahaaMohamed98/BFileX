@@ -8,13 +8,13 @@ include_directories(include/Terminal++/src src/include)
 
 add_executable(BFileX src/main.cpp
         include/Terminal++/src/Terminal++.hpp
-        src/include/App.hpp
-        src/include/BFileX.hpp
-        src/include/FileManager.hpp
-        src/include/FileProperties.hpp
-        src/include/InputHandler.hpp
-        src/include/UI.hpp
-        src/include/FilePreview.hpp
+        src/App.hpp
+        src/BFileX.hpp
+        src/FileManager.hpp
+        src/FileProperties.hpp
+        src/InputHandler.hpp
+        src/UI.hpp
+        src/FilePreview.hpp
         src/App.cpp
         src/BFileX.cpp
         src/FileManager.cpp
@@ -23,6 +23,6 @@ add_executable(BFileX src/main.cpp
         src/UI.cpp
         src/FilePreview.cpp
         src/CommandLineParser.cpp
-        src/include/CommandLineParser.hpp
-        src/include/debug.hpp
+        src/CommandLineParser.hpp
+        src/debug.hpp
 )
