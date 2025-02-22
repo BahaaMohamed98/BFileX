@@ -14,7 +14,7 @@ managing your files with vim-style keybindings and a color-coded display.
 - 🚀 Fast and lightweight
 - 🔍 File type detection with custom icons
 - 📊 Detailed file information (permissions, size, modified date)
-- 🖥️ Cross-platform support (Linux, macOS, Windows)
+- 🖥️ Cross-platform support (Linux, macOS)
 - 🔄 Real-time updates for file system changes
 - ⬆️ Comprehensive keybindings for navigation and actions
 - 📁 Directory management: Create, rename, and delete directories on the fly
@@ -47,62 +47,57 @@ Explore how BFileX looks and works in different scenarios:
   </div>
 </details>
 
-<details>
-  <summary><b>Directory Management</b></summary>
-  <div style="margin-left: 20px;">
-    <details>
-      <summary><b>Make Directory</b></summary>
-      <div align="center">
-        <img src="assets/makeDirectory.png" width="600" />
-        <br/>
-        <em>Creating a new directory</em>
-      </div>
+  <details>
+    <summary><b>Make Directory</b></summary>
+    <div align="center">
+      <img src="assets/makeDirectory.png" width="600" />
       <br/>
-      <div align="center">
-        <img src="assets/makeDirectory2.png" width="600" />
-        <br/>
-        <em>Newly created directory highlighted in the list</em>
-      </div>
-    </details>
-    <details>
-      <summary><b>Rename File/Directory</b></summary>
-      <div align="center">
-        <img src="assets/rename.png" width="600" />
-        <br/>
-        <em>Renaming a selected file or directory</em>
-      </div>
-    </details>
-    <details>
-      <summary><b>Delete File/Directory</b></summary>
-      <div align="center">
-        <img src="assets/delete.png" width="600" />
-        <br/>
-        <em>Deleting a file or directory</em>
-      </div>
+      <em>Creating a new directory</em>
+    </div>
+    <br/>
+    <div align="center">
+      <img src="assets/makeDirectory2.png" width="600" />
       <br/>
-      <div align="center">
-        <img src="assets/recursiveDelete.png" width="600" />
-        <br/>
-        <em>Confirmation for recursive deletion of directories</em>
-      </div>
-    </details>
-  </div>
-</details>
+      <em>Newly created directory highlighted in the list</em>
+    </div>
+  </details>
+
+  <details>
+    <summary><b>Rename File/Directory</b></summary>
+    <div align="center">
+      <img src="assets/rename.png" width="600" />
+      <br/>
+      <em>Renaming a selected file or directory</em>
+    </div>
+  </details>
+  <details>
+    <summary><b>Delete File/Directory</b></summary>
+    <div align="center">
+      <img src="assets/delete.png" width="600" />
+      <br/>
+      <em>Deleting a file or directory</em>
+    </div>
+    <br/>
+    <div align="center">
+      <img src="assets/recursiveDelete.png" width="600" />
+      <br/>
+      <em>Confirmation for recursive deletion of directories</em>
+    </div>
+  </details>
 
 ## 🚀 Installation
 
 ### Prerequisites
 
 - C++17 or higher
-    - CMake 3.15 or higher
-    - Git
+- CMake 3.15 or higher
+- Git
 
 ### Build from Source
 
 #### Clone the repository
 
 ```bash
-
 git clone https://github.com/BahaaMohamed98/BfileX.git
 cd BfileX
 ```
@@ -147,6 +142,7 @@ cmake --build .
 | <kbd>l</kbd>, <kbd>Enter</kbd>,<kbd>Right Arrow</kbd> | Open file/directory           |
 | <kbd>h</kbd>, <kbd>Left arrow</kbd>                   | Go to parent directory        |
 | <kbd>m</kbd>                                          | Make a new directory          |
+| <kbd>c</kbd>                                          | Create a new file             |
 | <kbd>r</kbd>                                          | Rename current entry          |
 | <kbd>d</kbd>                                          | Delete current entry          |
 | <kbd>t</kbd>                                          | Toggle sorting by time        |
