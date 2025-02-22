@@ -1,13 +1,15 @@
 #include "App.hpp"
 
 #include <atomic>
+#include <filesystem>
 
 #include "FileProperties.hpp"
 #include "Terminal++.hpp"
 
 App::App()
     : isRunning_(true), entryIndex(0), reverseEntries(false), showHiddenEntries(false),
-      showPreview(true), sortType(SortType::Normal), customFooter(nullptr), uiUpdateCallBack(nullptr) {
+      showPreview(true), sortType(SortType::Normal), customFooter(nullptr), uiUpdateCallBack(nullptr),
+      initializeTerminalCallBack(nullptr) {
     updateEntries(false);
 }
 
@@ -160,35 +162,53 @@ void App::resetFooter(const bool updateUI_) {
     setCustomFooter(nullptr, updateUI_);
 }
 
+void App::initializeTerminal() const {
+    if (initializeTerminalCallBack != nullptr) {
+        initializeTerminalCallBack();
+    }
+}
+
+void App::setInitalizeTerminalCallBack(std::function<void()> function) {
+    initializeTerminalCallBack = std::move(function);
+}
+
 const std::function<void()>& App::getCustomFooter() const {
     return customFooter;
 }
 
 void App::changeDirectory(const fs::path& path) {
+    const fs::path currentPath = fs::current_path();
+
     // return if trying to go back from root directory
-    if (FileProperties::Utilities::isDotDot(path) and fs::current_path() == fs::path("/")) {
+    if (FileProperties::Utilities::isDotDot(path) and currentPath == fs::path("/")) {
         return;
     }
 
     // the current path is the previous parent if we go back
-    const fs::path previousParent = fs::current_path();
+    const fs::path& previousParent = currentPath;
 
-    // Save the index of the current path for the future
-    entriesIndices[fs::current_path()] = getCurrentEntryIndex();
+    // cache the index of the selected entry in the current path
+    entriesIndices[currentPath] = getCurrentEntryIndex();
 
-    fs::current_path(path); // change directory
-    resetSearchQuery();     // reset search query after changing directory
-    updateEntries(false);   // get the new entries
+    try {
+        fs::current_path(path); // change directory to the given path
+        resetSearchQuery();     // reset search query after changing directory
+        updateEntries(false);   // get the new entries
 
-    if (FileProperties::Utilities::isDotDot(path) and fs::current_path().has_parent_path()) {
-        // when going back highlight the parent of the current directory
+        if (FileProperties::Utilities::isDotDot(path) and currentPath.has_parent_path()) {
+            // when going back highlight the parent of the current directory
 
-        // we search for the previous' parent index in the current directory
-        // and set the current entry index to its index
-        setCurrentEntryIndex(FileManager::getIndex(previousParent, entries));
-    } else {
-        // if entry visited before get it's stored index
-        setCurrentEntryIndex(getCachedIndex(path));
+            // search for the previous parent's index in the current directory
+            // and set the current entry's index to its index
+            setCurrentEntryIndex(FileManager::getIndex(previousParent, entries));
+        } else {
+            // if entry visited before get it's stored index
+            setCurrentEntryIndex(getCachedIndex(path));
+        }
+    } catch (const fs::filesystem_error&) {
+        setCustomFooter([] {
+            Printer(Color::Red).setTextStyle(TextStyle::Bold).print("Cannot change directory: Permission denied");
+        }, true);
     }
 }
 

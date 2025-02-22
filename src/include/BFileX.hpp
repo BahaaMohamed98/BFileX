@@ -19,6 +19,7 @@ class BFileX {
     static void signalHandler(int);
     static void handleResize(int);
     static void renderUI();
+    static void fullRenderUI();
 
 public:
     static void run(int argc, char** argv);

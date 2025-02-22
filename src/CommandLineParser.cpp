@@ -87,7 +87,7 @@ void CommandLineParser::parse(const int argc, char** argv) {
                 app.setShowPreview(false);
                 break;
             case Action::SetStartingDirectory:
-                if (!changedStartingDirectory) {
+                if (not changedStartingDirectory) {
                     app.setStartingEntry(argument);
                     changedStartingDirectory = true;
                 } else {

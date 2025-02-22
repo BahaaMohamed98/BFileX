@@ -5,7 +5,7 @@ void FilePreview::readFile(const std::string& path) {
     lines.clear(); // clear previous file
 
     std::ifstream file(path);
-    if (!file.is_open()) {
+    if (not file.is_open()) {
         // display an error message on failure
         lines.emplace_back(("Failed to open file: " + path).substr(0, maxLineWidth));
         return;

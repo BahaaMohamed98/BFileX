@@ -3,12 +3,7 @@
 #include "Terminal++.hpp"
 
 UI::UI() {
-    // setting up the terminal environment
-    Screen::enableAlternateScreen(); // uses the alternate screen buffer
-    Terminal::setTitle("BFileX");    // set the terminal title to "BFileX"
-    Cursor::hide();                  // hide the cursor for a cleaner UI
-    Screen::clear();                 // clear the screen on startup
-    Screen::disableLineWrap();       // disable line wrapping for more control and better UI
+    initialize();
 
     // setting the terminal dimensions
     auto [nWidth, nHeight] = Terminal::size();
@@ -20,6 +15,16 @@ UI::~UI() {
     Cursor::show();                   // show the cursor before exiting
     Screen::enableLineWrap();         // enable line wrapping back
     Screen::disableAlternateScreen(); // disable alternate screen buffer and return to main screen
+}
+
+void UI::initialize() {
+    // setting up the terminal environment
+    Screen::enableAlternateScreen(); // uses the alternate screen buffer
+    Terminal::setTitle("BFileX");    // set the terminal title to "BFileX"
+    Cursor::hide();                  // hide the cursor for a cleaner UI
+    Screen::clear();                 // clear the screen on startup
+    Screen::disableLineWrap();       // disable line wrapping for more control and better UI
+
 }
 
 void UI::printEntry(const std::filesystem::directory_entry& entry, const bool highlight) const {
@@ -106,13 +111,13 @@ void UI::renderPreview(const fs::directory_entry& entry) {
     }
 
     const EntryType entryType = FileProperties::Types::determineEntryType(entry);
-
+    
     if (entryType == EntryType::RegularFile) {
         const std::string filePath = FileProperties::MetaData::getName(entry).string();
 
         // renders the preview for selected file
         filePreview.render(filePath);
-    } else if (entryType == EntryType::Directory and !FileProperties::Utilities::isDotDot(entry)) {
+    } else if (entryType == EntryType::Directory and not FileProperties::Utilities::isDotDot(entry)) {
         App& app = App::getInstance();
 
         // render preview for the children of the current entry

@@ -6,10 +6,10 @@
 FileProperties::Icon::Icon(std::string icon) : representation(std::move(icon)) {}
 
 EntryType FileProperties::Types::determineEntryType(const fs::directory_entry& entry) {
-    if (entry.is_directory())
-        return EntryType::Directory;
     if (entry.is_symlink())
         return EntryType::Symlink;
+    if (entry.is_directory())
+        return EntryType::Directory;
     if (Utilities::isExecutable(entry.path()))
         return EntryType::Executable;
     if (entry.is_regular_file())
@@ -128,7 +128,7 @@ bool FileProperties::Utilities::isHidden(const std::filesystem::directory_entry&
 bool FileProperties::Utilities::isExecutable(const std::filesystem::path& path) {
     std::ifstream file(path, std::ios::binary); // Open the file in binary mode
 
-    if (!file.is_open()) {
+    if (not file.is_open()) {
         return false; // Return false if the file cannot be opened
     }
 
@@ -158,7 +158,7 @@ bool FileProperties::Utilities::isExecutable(const std::filesystem::path& path) 
 bool FileProperties::Utilities::isBinary(const std::string& path) {
     std::ifstream file(path, std::ios::binary);
 
-    if (!file.is_open()) {
+    if (not file.is_open()) {
         return false;
     }
 

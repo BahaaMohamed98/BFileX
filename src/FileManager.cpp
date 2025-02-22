@@ -5,7 +5,7 @@
 
 bool FileManager::applyReverse(const bool condition, const bool reverse) {
     if (reverse)
-        return !condition;
+        return not condition;
     return condition;
 }
 
@@ -27,9 +27,10 @@ std::vector<fs::directory_entry> FileManager::searchEntries(const std::string& s
     for (const auto& entry : entries) {
         std::string name = entry.path().filename().string();
 
-        const bool found = std::search(name.begin(), name.end(), searchQuery.begin(), searchQuery.end(), [] (char a, char b) {
-            return std::tolower(a) == std::tolower(b);
-        }) != name.end();
+        const bool found = std::search(name.begin(), name.end(), searchQuery.begin(), searchQuery.end(),
+                                       [](char a, char b) {
+                                           return std::tolower(a) == std::tolower(b);
+                                       }) != name.end();
 
         if (found) {
             results.emplace_back(entry);
@@ -51,24 +52,29 @@ void FileManager::setEntries(
 ) {
     entries.clear(); // clear previous entries
 
-    entries.emplace_back(".."); // add the previous directory `..` at the top
+    try {
+        entries.emplace_back(".."); // add the previous directory `..` at the top
 
-    for (const auto& item : fs::directory_iterator(rootPath)) {
-        // only add the item if it's not hidden or hidden files are allowed
-        if (showHidden or !FileProperties::Utilities::isHidden(item)) {
-            entries.push_back(item);
+        for (const auto& item : fs::directory_iterator{rootPath}) {
+            // only add the item if it's not hidden or hidden files are allowed
+            if (showHidden or not FileProperties::Utilities::isHidden(item)) {
+                entries.push_back(item);
+            }
         }
-    }
 
-    // if there exists a search query
-    if (!searchQuery.empty()) {
-        // filter out entries based on search results
-        entries = searchEntries(searchQuery, entries);
-    }
+        // if there exists a search query
+        if (not searchQuery.empty()) {
+            // filter out entries based on search results
+            entries = searchEntries(searchQuery, entries);
+        }
 
-    // sort the entries according to the sort type
-    if (sortType != SortType::None) {
-        sortEntries(entries, sortType, showHidden, reverse);
+        // sort the entries according to the sort type
+        if (sortType != SortType::None) {
+            sortEntries(entries, sortType, showHidden, reverse);
+        }
+    } catch (const fs::filesystem_error&) {
+        entries.clear();
+        entries.emplace_back("Permission denied!");
     }
 }
 
@@ -144,14 +150,25 @@ void FileManager::sortEntries(
         });
 }
 
-void FileManager::openFile(const std::string& filePath) {
+void FileManager::openFile(const fs::path& filePath) {
     std::string command;
 #ifdef __linux__
     command = "xdg-open";
 #else
     command = "open";
 #endif
-    std::system((command + " \'" + filePath + "\'").c_str());
+    std::system((command + " \'" + filePath.string() + "\'").c_str());
+}
+
+void FileManager::openFileInEditor(const fs::path& filePath) {
+    static const char* editor = std::getenv("EDITOR");
+
+    if (not editor) {
+        openFile(filePath);
+        return;
+    }
+
+    std::system((std::string{editor} + " \'" + filePath.string() + "\'").c_str());
 }
 
 int FileManager::getIndex(const fs::path& target, const std::vector<fs::directory_entry>& entries) {

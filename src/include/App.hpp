@@ -24,8 +24,7 @@ class App {
 
     std::function<void()> customFooter;
     std::function<void()> uiUpdateCallBack;
-
-    fs::path previousParent;
+    std::function<void()> initializeTerminalCallBack;
 
     App();
 
@@ -68,6 +67,9 @@ public:
     void setCustomFooter(std::function<void()> customFooter, bool updateUI_);
     const std::function<void()>& getCustomFooter() const;
     void resetFooter(bool updateUI_ = true);
+
+    void initializeTerminal() const;
+    void setInitalizeTerminalCallBack(std::function<void()> function);
 
     void updateUI() const;
     void setUiUpdateCallBack(std::function<void()> function);

@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <csignal>
+#include <filesystem>
 
 #include "App.hpp"
 #include "CommandLineParser.hpp"
@@ -41,17 +42,7 @@ void BFileX::renderUI() {
         std::tie(previousWidth, previousHeight) != std::tie(terminalWidth, terminalHeight) or
         previousEntries != app.getEntries()
     ) { // full UI re-render
-        Screen::clear();
-        ui.renderTopBar((fs::current_path() / app.getCurrentEntry().path()).string());
-
-        // render preview if enabled
-        if (app.shouldShowPreview()) {
-            ui.renderPreview(app.getCurrentEntry());
-        }
-
-        // render entries and footer
-        ui.renderEntries(app.getEntries(), app.getCurrentEntryIndex(), 1, 2);
-        ui.renderFooter(app);
+        fullRenderUI();
     } else if (previousPreviewOn != app.shouldShowPreview()) {
         // preview state changed
         if (app.shouldShowPreview()) {
@@ -76,6 +67,20 @@ void BFileX::renderUI() {
     previousHeight = terminalHeight;
 }
 
+void BFileX::fullRenderUI() {
+    Screen::clear();
+    ui.renderTopBar(fs::absolute(app.getCurrentEntry()));
+
+    // render preview if enabled
+    if (app.shouldShowPreview()) {
+        ui.renderPreview(app.getCurrentEntry());
+    }
+
+    // render entries and footer
+    ui.renderEntries(app.getEntries(), app.getCurrentEntryIndex(), 1, 2);
+    ui.renderFooter(app);
+}
+
 void BFileX::run(const int argc, char** argv) {
     // handling command line options
     CommandLineParser::parse(argc, argv);
@@ -86,6 +91,10 @@ void BFileX::run(const int argc, char** argv) {
     signal(SIGWINCH, handleResize);
 
     app.setUiUpdateCallBack(renderUI);
+    app.setInitalizeTerminalCallBack([] {
+        UI::initialize();
+        fullRenderUI();
+    });
     app.updateUI();
 
     // handling user input

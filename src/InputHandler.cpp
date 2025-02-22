@@ -1,4 +1,5 @@
 #include "InputHandler.hpp"
+#include <filesystem>
 #include <fstream>
 
 InputHandler::InputHandler()
@@ -13,15 +14,21 @@ void InputHandler::handleDown() const {
 }
 
 void InputHandler::handleEnter() const {
-    if (app.getCurrentEntry().is_directory()) {
-        app.changeDirectory(
-            fs::current_path() / FileProperties::MetaData::getName(app.getCurrentEntry())
-        );
-    } else if (app.getCurrentEntry().is_regular_file() and
-               not FileProperties::Utilities::isExecutable(app.getCurrentEntry().path())) {
-        FileManager::openFile(
-            (fs::current_path() / app.getCurrentEntry().path()).string()
-        );
+    const fs::directory_entry currentEntry = app.getCurrentEntry();
+
+    if (currentEntry.is_directory()) {
+        app.changeDirectory(fs::absolute(currentEntry));
+    } else if (currentEntry.is_regular_file() and not FileProperties::Utilities::isExecutable(currentEntry.path())) {
+        if (FileProperties::Utilities::isBinary(currentEntry.path().string())) {
+            FileManager::openFile(fs::absolute(currentEntry));
+            return;
+        }
+
+        // open the file in the user's editor
+        FileManager::openFileInEditor(fs::absolute(currentEntry));
+
+        // revert the editor's changes to the terminal
+        app.initializeTerminal();
     }
 }
 
@@ -39,7 +46,8 @@ void InputHandler::handleRename() const {
     }
 
     // return if user cancelled
-    if (!readInputString("New name: ", inputBuffer, FileProperties::Types::determineEntryType(app.getCurrentEntry()))) {
+    if (not readInputString("New name: ", inputBuffer,
+                            FileProperties::Types::determineEntryType(app.getCurrentEntry()))) {
         return;
     }
 
@@ -57,7 +65,7 @@ void InputHandler::handleRename() const {
         // if entry already exists prompt the user about overriding it
         if (fs::exists(newPath)) {
             // return if the answer is not yes
-            if (!confirmAction("Entry already exists override it? (y/n) ")) {
+            if (not confirmAction("Entry already exists override it? (y/n) ")) {
                 app.resetFooter();
                 return;
             }
@@ -94,7 +102,7 @@ void InputHandler::handleDelete() const {
     }
 
     // return if the answer is not yes
-    if (!confirmAction("Are you sure you want to delete \"" + targetEntry.string() + "\"? (y/n) ")) {
+    if (not confirmAction("Are you sure you want to delete \"" + targetEntry.string() + "\"? (y/n) ")) {
         app.resetFooter();
         return;
     }
@@ -102,9 +110,9 @@ void InputHandler::handleDelete() const {
     try {
         // if entry is a non empty directory prompt the user about recursively deleting it
         if (FileProperties::Types::determineEntryType(app.getCurrentEntry()) == EntryType::Directory and
-            !is_empty(app.getCurrentEntry())) {
+            not is_empty(app.getCurrentEntry())) {
             // return if the answer is not yes
-            if (!confirmAction("Directory is not empty, delete it recursively? (y/n) ")) {
+            if (not confirmAction("Directory is not empty, delete it recursively? (y/n) ")) {
                 app.resetFooter();
                 return;
             }
@@ -138,14 +146,15 @@ void InputHandler::handleDelete() const {
 }
 
 void InputHandler::handleTogglePreview() const {
-    app.setShowPreview(!app.shouldShowPreview());
+    app.setShowPreview(not app.shouldShowPreview());
 }
 
 void InputHandler::handleToggleSearch() const {
     std::string inputBuffer = app.getSearchQuery();
 
     // return if user cancelled
-    if (!readInputString("Search: ", inputBuffer, FileProperties::Types::determineEntryType(app.getCurrentEntry()))) {
+    if (not readInputString("Search: ", inputBuffer,
+                            FileProperties::Types::determineEntryType(app.getCurrentEntry()))) {
         return;
     }
 
@@ -170,14 +179,14 @@ void InputHandler::handleToggleSortBySize() const {
 }
 
 void InputHandler::handleToggleReverseEntries() const {
-    app.setReverseEntries(!app.shouldReverseEntries());
+    app.setReverseEntries(not app.shouldReverseEntries());
 }
 
 void InputHandler::handleMakeDirectory() const {
     std::string inputBuffer;
 
     // return if user cancelled
-    if (!readInputString("Enter directory name: ", inputBuffer, EntryType::Directory)) {
+    if (not readInputString("Enter directory name: ", inputBuffer, EntryType::Directory)) {
         return;
     }
 
@@ -204,7 +213,7 @@ void InputHandler::handleMakeDirectory() const {
         app.updateEntries(false);
 
         // place cursor on the newly created directory
-        const int newIndex = FileManager::getIndex(fs::current_path() / fs::path(inputBuffer), app.getEntries());
+        const int newIndex = FileManager::getIndex(fs::absolute(inputBuffer), app.getEntries());
         app.setCurrentEntryIndex(newIndex);
     } else {
         app.setCustomFooter([] {
@@ -216,7 +225,7 @@ void InputHandler::handleMakeDirectory() const {
 void InputHandler::handleCreateFile() const {
     std::string inputBuffer;
 
-    if (!readInputString("Enter file name: ", inputBuffer, EntryType::RegularFile)) {
+    if (not readInputString("Enter file name: ", inputBuffer, EntryType::RegularFile)) {
         return;
     }
 
@@ -235,7 +244,7 @@ void InputHandler::handleCreateFile() const {
         app.updateEntries(false);
 
         // place cursor on the newly created file
-        const int fileIndex = FileManager::getIndex(fs::current_path() / fs::path(inputBuffer), app.getEntries());
+        const int fileIndex = FileManager::getIndex(fs::absolute(inputBuffer), app.getEntries());
         app.setCurrentEntryIndex(fileIndex);
     } else {
         app.setCustomFooter([] {
@@ -245,7 +254,7 @@ void InputHandler::handleCreateFile() const {
 }
 
 void InputHandler::handleToggleHideEntries() const {
-    app.setShowHiddenEntries(!app.shouldShowHiddenEntries());
+    app.setShowHiddenEntries(not app.shouldShowHiddenEntries());
     app.updateEntries(true);
 }
 
@@ -291,7 +300,7 @@ bool InputHandler::readInputString(const std::string_view prompt, std::string& i
                 isTakingInput = false;
                 break;
             case keyCode::Backspace:
-                if (!inputBuffer.empty()) {
+                if (not inputBuffer.empty()) {
                     inputBuffer.pop_back();
                     app.updateUI();
                 }

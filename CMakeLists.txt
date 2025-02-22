@@ -24,4 +24,5 @@ add_executable(BFileX src/main.cpp
         src/FilePreview.cpp
         src/CommandLineParser.cpp
         src/include/CommandLineParser.hpp
+        src/include/debug.hpp
 )

@@ -47,7 +47,12 @@ public:
 
     // opens a file using the default system command based on the platform
     // should work on Windows, Linux, and macOS using platform-specific commands
-    static void openFile(const std::string& filePath);
+    static void openFile(const fs::path& filePath);
+    // opens a file using the user's default editor
+    // found from the $EDITOR environment variable
+    // falls back to using `openFile()`
+    // assumes the file is a text file
+    static void openFileInEditor(const fs::path& filePath);
     // returns the index of a path in a given vector of entries
     static int getIndex(const fs::path& target, const std::vector<fs::directory_entry>& entries);
 };

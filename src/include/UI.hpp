@@ -25,6 +25,8 @@ public:
     UI(UI&) = delete; // deleting the copy constructor
     ~UI();            // restore the terminal to its previous state
 
+    // initialize the termianl
+    static void initialize();
     // render the top bar with the current path
     void renderTopBar(const std::string& currentPath) const;
     // render the entries
